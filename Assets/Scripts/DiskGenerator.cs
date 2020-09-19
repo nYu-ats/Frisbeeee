@@ -18,7 +18,7 @@ public class DiskGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-                //マウス入力取得
+        //マウス入力取得
         if(Input.GetMouseButtonDown(0))
         {
             pos_start = Input.mousePosition;
@@ -30,6 +30,7 @@ public class DiskGenerator : MonoBehaviour
         }
         if(Input.GetMouseButtonUp(0))
         {
+            //マウスが離されたら射出方向を設定してディスク生成
             pos_end = Input.mousePosition;
             GameObject disk = Instantiate(diskPrefab) as GameObject;
             disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
@@ -41,26 +42,49 @@ public class DiskGenerator : MonoBehaviour
 
 public static class Orbit
 {
-    static float maxWidth = 100.0f;
-    static float maxHeight = 100.0f;
-    static float maxRot = 60.0f;
+    static float maxWidth = 500.0f;
+    static float maxHeight = 500.0f;
+    static float maxRotX = 60.0f;
+    static float maxRotY = 45.0f;
     static float x = 0.0f;
     static float y = 0.0f;
 
     //マウスの移動量から射出方向の回転角度へ変換
     public static (float, float) ReleaseDirection(Vector2 start, Vector2 end)
     {
+        float move_x = 0.0f;
+        float move_y = 0.0f;
         Vector2 move = end -start;
-        float move_x = (float)move.x;
-        float move_y = (float)move.y;
-        if((-maxWidth <= move_x) && (move_x <= maxWidth))
+        if (Mathf.Abs(move.x) <= maxWidth)
         {
-            x = maxRot * move_x / maxWidth;
-        } 
-        if((-maxHeight <= move_y) && (move_y <= maxHeight))
-        {
-            y = maxRot * move_y / maxHeight;
+            move_x = (float)move.x;    
         }
+        else if(move.x <= 0)
+        {
+            move_x = -maxWidth;
+        }
+        else
+        {
+            move_x = maxWidth;
+        }
+
+        if (Mathf.Abs(move.y) <= maxHeight)
+        {
+            move_y = (float)move.y;    
+        }
+        else if(move.y <= 0)
+        {
+            move_y = -maxHeight;
+        }
+        else
+        {
+            move_y = maxHeight;
+        }
+
+         x = maxRotX * move_x / maxWidth;
+         y = maxRotY * move_y / maxHeight;
+
+        //Debug.Log((x,y));
         return (x, y);
     }
 }
