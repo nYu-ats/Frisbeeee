@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2133913918457071601}
   - component: {fileID: 2133913918457071602}
   - component: {fileID: 2133913918457071603}
-  - component: {fileID: 2133913918457071612}
-  - component: {fileID: 2133913918457071613}
   - component: {fileID: 2133913918457071600}
+  - component: {fileID: 2133913918457071613}
+  - component: {fileID: 747781824478205761}
   m_Layer: 0
   m_Name: frisbee_sample
   m_TagString: Untagged
@@ -82,20 +82,22 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &2133913918457071612
-CapsuleCollider:
+--- !u!54 &2133913918457071600
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2133913918457071614}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 0
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 1
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &2133913918457071613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,20 +113,17 @@ MonoBehaviour:
   addForce: 500
   decreaseForceX: -2
   decreaseForceY: -2
-  ToruqueX: 50
---- !u!54 &2133913918457071600
-Rigidbody:
+  ToruqueX: 10
+--- !u!65 &747781824478205761
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2133913918457071614}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Size: {x: 0.7, y: 1.5, z: 0.7}
+  m_Center: {x: 0, y: 0, z: 0}

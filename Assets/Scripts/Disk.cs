@@ -23,29 +23,39 @@ public class Disk : MonoBehaviour
     //フリスビーを回転させるメソッド
     public void RotateFrisbee(float x)
     {
-        if(x > 0)
+        if(x >= 0)
         {
-            this.GetComponent<Rigidbody>().AddTorque(ToruqueX, 0, 0, ForceMode.Force);
+            this.GetComponent<Rigidbody>().AddTorque(0, 0, ToruqueX, ForceMode.Acceleration);
         }
         else
         {
-            this.GetComponent<Rigidbody>().AddTorque(-ToruqueX, 0, 0, ForceMode.Force);
+            this.GetComponent<Rigidbody>().AddTorque(0, 0, -ToruqueX, ForceMode.Acceleration);
         }
     }
-/*
-    //フリスビーを傾けるメソッド。editer上で確認したが、勝手にx軸で回転させてくれてるっぽい？
-    public void DirFrisbee(float y)
+
+    //フリスビーを傾けるメソッド。
+    public void DirFrisbee(float x, float z)
     {
-        transform.rotation = Quaternion.Euler(y, 0, 0);
+        if(x >= 0)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, z);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(0, 0, -z);
+        }
+        
     }
-*/
+
     void Start()
     {
         //初期で加える力を射出方向に分解
         addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
         addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));
         addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
+        DirFrisbee(direction.x, direction.y);
         RotateFrisbee(direction.x);
+        //RotateFrisbee(direction.x);
         BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
     }
 
