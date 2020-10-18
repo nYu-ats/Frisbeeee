@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BLINDED_AM_ME
 {
-    public class MeshCut
+    public class MeshCut : MonoBehaviour
     {
         public class MeshCutSide
         {
@@ -201,20 +201,26 @@ namespace BLINDED_AM_ME
             {
                 right_HalfMesh.SetIndices(right_side.subIndices[i].ToArray(), MeshTopology.Triangles, i);
             }
-            var clone = Object.Instantiate(victim) as GameObject;
-            //左側のメッシュを元のオブジェクトとして扱う
-            victim.name = "left side";
-            victim.GetComponent<MeshFilter>().mesh = left_HalfMesh;
-            GameObject leftSideObj = victim;
-            leftSideObj.GetComponent<CapsuleCollider>().enabled = true;
-            leftSideObj.GetComponent<Collider>().attachedRigidbody.useGravity = true;
+            //分割用のクローン作製
+            var cloneleft = Object.Instantiate(victim) as GameObject;
+            var cloneright = Object.Instantiate(victim) as GameObject;
 
-            GameObject rightSideObj = clone;
-            rightSideObj.transform.parent = victim.transform.parent;
-            rightSideObj.transform.localPosition = victim.transform.localPosition;
-            rightSideObj.transform.localScale = victim.transform.localScale;
-            rightSideObj.name = "right side";
-            rightSideObj.GetComponent<MeshFilter>().mesh = right_HalfMesh;
+            //Destroy(clone.GetComponent<CapsuleCollider>());
+
+            //左側のメッシュを元のオブジェクトに割り当てる
+            //Destroy(victim.GetComponent<CapsuleCollider>());
+            cloneleft.name = "left side";
+            cloneleft.GetComponent<MeshFilter>().mesh = left_HalfMesh;
+            GameObject leftSideObj = cloneleft;
+
+            //某サイトでは下記処理を書いていたが、今回は必要なさそう
+            //rightSideObj.transform.parent = clone.transform.parent;
+            //rightSideObj.transform.localPosition = clone.transform.localPosition;
+            //rightSideObj.transform.localScale = clone.transform.localScale;
+            cloneright.name = "right side";
+            cloneright.GetComponent<MeshFilter>().mesh = right_HalfMesh;
+            GameObject rightSideObj = cloneright;
+
             //右側の分は新しくGameObjectを作る
             /*GameObject rightSideObj = new GameObject("right side", typeof(MeshFilter), typeof(MeshRenderer));
             rightSideObj.transform.position = victim.transform.position;
@@ -224,6 +230,12 @@ namespace BLINDED_AM_ME
             //それぞれマテリアルを設定
             leftSideObj.GetComponent<MeshRenderer>().materials = mats;
             rightSideObj.GetComponent<MeshRenderer>().materials = mats;
+
+            //colliderを再設定
+            Destroy(leftSideObj.GetComponent<CapsuleCollider>());
+            leftSideObj.AddComponent<CapsuleCollider>().isTrigger = true;
+            Destroy(rightSideObj.GetComponent<CapsuleCollider>());
+            rightSideObj.AddComponent<CapsuleCollider>().isTrigger = true;
             //最後にGameObjectの配列として戻す
             return new GameObject[]{leftSideObj, rightSideObj };
         }

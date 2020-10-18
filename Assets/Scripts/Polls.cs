@@ -10,12 +10,18 @@ public class Polls : MonoBehaviour
     static Vector3 anchorpoint;
     static Material capMaterial;
     GameObject[] cuttedObjects;
+    static Vector3 normalDirectionStd = new Vector3(0.0f, 1.0f, 0.0f);
 
     // Start is called before the first frame update
     void Start()
     {
-        victim = GameObject.Find("poll_sample");
+        victim = this.gameObject;
         capMaterial = victim.GetComponent<Renderer>().material;
+        //切断後のオブジェクトに力を加えられるかのテスト
+        if(victim.name == "right side")
+        {
+            victim.GetComponent<Rigidbody>().AddForce(1.0f, 0.0f, 0.0f, ForceMode.Impulse);
+        }
     }
 
     // Update is called once per frame
@@ -24,25 +30,19 @@ public class Polls : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(Collider collision)
+    void OnTriggerExit(Collider collision)
     {
-        Debug.Log("trigger");
-        GetComponent<CapsuleCollider>().enabled = false;
-        BLINDED_AM_ME.MeshCut.Cut(victim, new Vector3(-0.5f, 0.0f, 5.0f), new Vector3(0.5f, 0.5f, 0.0f) , capMaterial);
-        /*
-        normalDirection = collision.contacts[0].normal;
-        anchorpoint = collision.contacts[0].point;
-        Debug.Log(normalDirection);
-        Debug.Log(anchorpoint);
-        BLINDED_AM_ME.MeshCut.Cut(victim, anchorpoint, normalDirection , capMaterial);
-        
-        Debug.Log(cuttedObjects[0]);
-        Debug.Log(cuttedObjects[1]);
-        foreach(GameObject obj in cuttedObjects)
+        if(collision.gameObject.tag == "Disk")
         {
-            Instantiate(obj);
+            anchorpoint = collision.ClosestPointOnBounds(this.transform.position);
+            normalDirection = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z) * normalDirectionStd;
+            Debug.Log(transform.rotation.eulerAngles.z);            
+            Debug.Log(transform.rotation.z);
+            GetComponent<CapsuleCollider>().enabled = false;
+            BLINDED_AM_ME.MeshCut.Cut(victim, anchorpoint, normalDirection , capMaterial);
+            Destroy(victim);
         }
-        Destroy(victim);
-        */
     }
+
+
 }

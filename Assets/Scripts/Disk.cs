@@ -13,11 +13,35 @@ public class Disk : MonoBehaviour
     static float addForceX;
     static float addForceY;
     static float addForceZ;
+    private AudioSource audioPlay1;
 
-    //フリスビーに力を加えるメソッド
-    public void BehaviourFrisbee(Vector3 dir)
+    public GameObject effectParcitle;
+    public Vector3 effectParticleRotation;
+
+    void Start()
     {
-        this.GetComponent<Rigidbody>().AddForce(dir);
+        //初期で加える力を射出方向に分解
+        addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
+        addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));
+        addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
+        DirFrisbee(direction.x, direction.y);
+        RotateFrisbee(direction.x);
+        //RotateFrisbee(direction.x);
+        BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
+        audioPlay1 = GetComponent<AudioSource>();
+    }
+
+    void Update()
+    {
+        //xの向きに応じて加速度の向きを反転
+        if(direction.x >=0)
+        {
+            BehaviourFrisbee(new Vector3(decreaseForceX, decreaseForceY, 0));
+        }
+        else
+        {
+            BehaviourFrisbee(new Vector3(-decreaseForceX, decreaseForceY, 0));
+        }
     }
 
     //フリスビーを回転させるメソッド
@@ -31,6 +55,12 @@ public class Disk : MonoBehaviour
         {
             this.GetComponent<Rigidbody>().AddTorque(0, 0, -ToruqueX, ForceMode.Acceleration);
         }
+    }
+
+    //フリスビーに力を加えるメソッド
+    public void BehaviourFrisbee(Vector3 dir)
+    {
+        this.GetComponent<Rigidbody>().AddForce(dir);
     }
 
     //フリスビーを傾けるメソッド。
@@ -47,29 +77,10 @@ public class Disk : MonoBehaviour
         
     }
 
-    void Start()
+    void OnTriggerEnter(Collider collision)
     {
-        //初期で加える力を射出方向に分解
-        addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
-        addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));
-        addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
-        DirFrisbee(direction.x, direction.y);
-        RotateFrisbee(direction.x);
-        //RotateFrisbee(direction.x);
-        BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
-    }
-
-    void Update()
-    {
-        //xの向きに応じて加速度の向きを反転
-        if(direction.x >=0)
-        {
-            BehaviourFrisbee(new Vector3(decreaseForceX, decreaseForceY, 0));
-        }
-        else
-        {
-            BehaviourFrisbee(new Vector3(-decreaseForceX, decreaseForceY, 0));
-        }
+        Instantiate(effectParcitle, this.transform.position, Quaternion.Euler(effectParticleRotation));
+        audioPlay1.Play();
     }
 }
 
