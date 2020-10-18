@@ -36,8 +36,6 @@ public class Polls : MonoBehaviour
         {
             anchorpoint = collision.ClosestPointOnBounds(this.transform.position);
             normalDirection = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z) * normalDirectionStd;
-            Debug.Log(transform.rotation.eulerAngles.z);            
-            Debug.Log(transform.rotation.z);
             GetComponent<CapsuleCollider>().enabled = false;
             BLINDED_AM_ME.MeshCut.Cut(victim, anchorpoint, normalDirection , capMaterial);
             Destroy(victim);

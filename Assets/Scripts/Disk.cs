@@ -13,10 +13,15 @@ public class Disk : MonoBehaviour
     static float addForceX;
     static float addForceY;
     static float addForceZ;
-    private AudioSource audioPlay1;
+    static AudioSource audioPlayer;
+    public AudioClip audioClipBall;
+    public AudioClip audioClipPoll;
 
-    public GameObject effectParcitle;
-    public Vector3 effectParticleRotation;
+    public GameObject effectParticlePoll;
+    public GameObject effectParticleBall;
+    public Vector3 effectRotation;
+    public GameObject effectCollisionFlash;
+    static Vector3 collisionPosition;
 
     void Start()
     {
@@ -28,7 +33,7 @@ public class Disk : MonoBehaviour
         RotateFrisbee(direction.x);
         //RotateFrisbee(direction.x);
         BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
-        audioPlay1 = GetComponent<AudioSource>();
+        audioPlayer = this.gameObject.GetComponent<AudioSource>();
     }
 
     void Update()
@@ -79,8 +84,19 @@ public class Disk : MonoBehaviour
 
     void OnTriggerEnter(Collider collision)
     {
-        Instantiate(effectParcitle, this.transform.position, Quaternion.Euler(effectParticleRotation));
-        audioPlay1.Play();
+        collisionPosition = this.transform.position;
+        if(collision.gameObject.tag == "Ball")
+        {
+            audioPlayer.PlayOneShot(audioClipBall);
+            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
+            Instantiate(effectParticleBall, collisionPosition, Quaternion.Euler(effectRotation));
+        }else if(collision.gameObject.tag == "Poll")
+        {
+            audioPlayer.PlayOneShot(audioClipPoll);
+            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
+            Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
+        }
+        //Destroy(flashObj);
     }
 }
 

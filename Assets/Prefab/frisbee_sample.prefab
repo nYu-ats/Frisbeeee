@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 935c69820e210c54a81898604bf6c131, type: 2}
+  - {fileID: 2100000, guid: 4f477167fc0be5e4dab9a125b37c42ad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -116,9 +116,15 @@ MonoBehaviour:
   decreaseForceX: -2
   decreaseForceY: -2
   ToruqueX: 10
-  effectParcitle: {fileID: 5370940135930366272, guid: 21a8e1926170b6b459cf4cda4058849f,
+  audioClipBall: {fileID: 8300000, guid: 83584d293e4a0294f9deede746469704, type: 3}
+  audioClipPoll: {fileID: 8300000, guid: 799d96fd1ed5db44981e86b26d9ce225, type: 3}
+  effectParticlePoll: {fileID: 5370940135930366272, guid: 21a8e1926170b6b459cf4cda4058849f,
     type: 3}
-  effectParticleRotation: {x: 0, y: 0, z: 0}
+  effectParticleBall: {fileID: 5582284000749597801, guid: 8c8ea447e0a5c7944a30e2b8de3625ac,
+    type: 3}
+  effectRotation: {x: 0, y: 0, z: 0}
+  effectCollisionFlash: {fileID: 717432252059397904, guid: ac53738d20bc8bc4092a81e8bc97da9f,
+    type: 3}
 --- !u!65 &5381260623983104098
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -142,7 +148,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 799d96fd1ed5db44981e86b26d9ce225, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

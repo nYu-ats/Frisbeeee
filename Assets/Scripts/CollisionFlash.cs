@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Balls : MonoBehaviour
+public class CollisionFlash : MonoBehaviour
 {
+    public float lifeTime;
+    static float timeCount = 0.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -13,11 +15,10 @@ public class Balls : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    void OnTriggerEnter(Collider collision)
-    {
-        Destroy(this.gameObject);
+        timeCount += Time.deltaTime;
+        if(timeCount >= lifeTime)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
