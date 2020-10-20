@@ -5,12 +5,11 @@ using BLINDED_AM_ME;
 
 public class Polls : MonoBehaviour
 {
-    static GameObject victim;
-    static Vector3 normalDirection;
-    static Vector3 anchorpoint;
-    static Material capMaterial;
-    GameObject[] cuttedObjects;
-    static Vector3 normalDirectionStd = new Vector3(0.0f, 1.0f, 0.0f);
+    private GameObject victim;
+    private Vector3 normalDirection;
+    private Vector3 anchorpoint;
+    private Material capMaterial;
+    private Vector3 normalDirectionStd = new Vector3(0.0f, 1.0f, 0.0f);
 
     // Start is called before the first frame update
     void Start()

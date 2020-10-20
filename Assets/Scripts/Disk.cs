@@ -18,7 +18,9 @@ public class Disk : MonoBehaviour
     public AudioClip audioClipPoll;
 
     public GameObject effectParticlePoll;
-    public GameObject effectParticleBall;
+    public GameObject effectParticleBallRed;
+    public GameObject effectParticleBallBlue;
+    public GameObject effectParticleBallWhite;
     public Vector3 effectRotation;
     public GameObject effectCollisionFlash;
     static Vector3 collisionPosition;
@@ -85,18 +87,30 @@ public class Disk : MonoBehaviour
     void OnTriggerEnter(Collider collision)
     {
         collisionPosition = this.transform.position;
-        if(collision.gameObject.tag == "Ball")
+        if(collision.gameObject.tag == "RedBall")
         {
             audioPlayer.PlayOneShot(audioClipBall);
             Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticleBall, collisionPosition, Quaternion.Euler(effectRotation));
-        }else if(collision.gameObject.tag == "Poll")
+            Instantiate(effectParticleBallRed, collisionPosition, Quaternion.Euler(effectRotation));
+        }
+        else if(collision.gameObject.tag == "BlueBall")
+        {
+            audioPlayer.PlayOneShot(audioClipBall);
+            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
+            Instantiate(effectParticleBallBlue, collisionPosition, Quaternion.Euler(effectRotation));
+        }
+        else if(collision.gameObject.tag == "WhiteBall")
+        {
+            audioPlayer.PlayOneShot(audioClipBall);
+            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
+            Instantiate(effectParticleBallWhite, collisionPosition, Quaternion.Euler(effectRotation));
+        }
+        else if((collision.gameObject.tag == "BluePoll") | (collision.gameObject.tag == "RedPoll") | (collision.gameObject.tag == "WhitePoll"))
         {
             audioPlayer.PlayOneShot(audioClipPoll);
             Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
-        //Destroy(flashObj);
     }
 }
 
