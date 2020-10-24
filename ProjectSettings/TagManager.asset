@@ -8,6 +8,12 @@ TagManager:
   - Disk
   - Ball
   - Poll
+  - BlueBall
+  - RedBall
+  - BluePoll
+  - RedPoll
+  - WhitePoll
+  - WhiteBall
   layers:
   - Default
   - TransparentFX

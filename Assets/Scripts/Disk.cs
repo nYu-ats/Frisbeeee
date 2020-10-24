@@ -33,7 +33,6 @@ public class Disk : MonoBehaviour
         addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
         DirFrisbee(direction.x, direction.y);
         RotateFrisbee(direction.x);
-        //RotateFrisbee(direction.x);
         BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
         audioPlayer = this.gameObject.GetComponent<AudioSource>();
     }

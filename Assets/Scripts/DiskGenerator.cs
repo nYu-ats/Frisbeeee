@@ -8,6 +8,7 @@ public class DiskGenerator : MonoBehaviour
     static Vector2 pos_tmp;
     static Vector2 pos_end;
     public GameObject diskPrefab;
+    private Vector3 releasePosition;
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +33,9 @@ public class DiskGenerator : MonoBehaviour
         {
             //マウスが離されたら射出方向を設定してディスク生成
             pos_end = Input.mousePosition;
-            GameObject disk = Instantiate(diskPrefab) as GameObject;
+            releasePosition = GameObject.Find("Main Camera").transform.position;
+            //GameObject disk = Instantiate(diskPrefab, new Vector3(releasePosition.x, releasePosition.y + 0.5f, releasePosition.z), Quaternion.identity) as GameObject;
+            GameObject disk = Instantiate(diskPrefab, releasePosition, Quaternion.identity) as GameObject;
             disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
         }
 
