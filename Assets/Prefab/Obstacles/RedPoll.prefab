@@ -43,7 +43,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.98039216, g: 0.50980395, b: 0.3137255, a: 1}
-  m_Intensity: 0.5
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -201,6 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2bd5f27b5321ce46a0634c8a82ec913, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cuttedMaterial: {fileID: 2100000, guid: 9c3b338d1a2856f439c1f74e889dd139, type: 2}
 --- !u!54 &4119825548351394665
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
-    [SerializeField] float moveSpeed;
+    public float moveSpeed;
     private Vector3 cameraPosition;
     private Quaternion cameraRotation;
     private float positionZ;
@@ -18,7 +18,16 @@ public class CameraMove : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    { 
+    {
+        if(GameController.gamePause)
+        {
+            Time.timeScale = 0.0f;
+        }
+        else
+        {
+            Time.timeScale = 1.0f;
+        }
+
         positionZ += moveSpeed * Time.deltaTime;
         this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, positionZ);
     }

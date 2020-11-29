@@ -14,7 +14,6 @@ namespace BLINDED_AM_ME
             public List<int>      triangles = new List<int>();
             public List<List<int>> subIndices = new List<List<int>>();
 
-
             //各オブジェクト構成要素を初期化するメソッド
             public void ClearAll()
             {
@@ -103,7 +102,7 @@ namespace BLINDED_AM_ME
         private static List<Vector3> new_vertices = new List<Vector3>();
 
         //カット処理全体を行うメソッド
-        public static GameObject[] Cut(GameObject victim, Vector3 anchorPoint, Vector3 normalDirection, Material capMaterial)
+        public static GameObject[] Cut(GameObject victim, Vector3 anchorPoint, Vector3 normalDirection, Material capMaterial, Material cuttedMaterial, float globalPosisionZ)
         {
             //法線とグローバルでのアンカーポイントを元にカットする平面を定義
             blade = new Plane(
@@ -210,6 +209,7 @@ namespace BLINDED_AM_ME
             //左側のメッシュを元のオブジェクトに割り当てる
             //Destroy(victim.GetComponent<CapsuleCollider>());
             cloneleft.name = "left side";
+            cloneleft.transform.position = new Vector3(cloneleft.transform.position.x, cloneleft.transform.position.y, cloneleft.transform.position.z + globalPosisionZ);
             cloneleft.GetComponent<MeshFilter>().mesh = left_HalfMesh;
             GameObject leftSideObj = cloneleft;
 
@@ -218,6 +218,7 @@ namespace BLINDED_AM_ME
             //rightSideObj.transform.localPosition = clone.transform.localPosition;
             //rightSideObj.transform.localScale = clone.transform.localScale;
             cloneright.name = "right side";
+            cloneright.transform.position = new Vector3(cloneright.transform.position.x, cloneright.transform.position.y, cloneright.transform.position.z + globalPosisionZ);
             cloneright.GetComponent<MeshFilter>().mesh = right_HalfMesh;
             GameObject rightSideObj = cloneright;
 
@@ -233,11 +234,21 @@ namespace BLINDED_AM_ME
 
             //colliderを再設定
             Destroy(leftSideObj.GetComponent<CapsuleCollider>());
-            leftSideObj.AddComponent<CapsuleCollider>().isTrigger = true;
+            leftSideObj.AddComponent<CapsuleCollider>().isTrigger = false;
+            AfterCutAction(leftSideObj, cuttedMaterial, true);
             Destroy(rightSideObj.GetComponent<CapsuleCollider>());
-            rightSideObj.AddComponent<CapsuleCollider>().isTrigger = true;
+            rightSideObj.AddComponent<CapsuleCollider>().isTrigger = false;
+            AfterCutAction(rightSideObj, cuttedMaterial, true);
             //最後にGameObjectの配列として戻す
             return new GameObject[]{leftSideObj, rightSideObj };
+        }
+
+        static void AfterCutAction(GameObject cuttedObj, Material cuttedMaterial, bool rotateFlag)
+        {
+            Destroy(cuttedObj.transform.GetChild(0).gameObject);
+            cuttedObj.GetComponent<MeshRenderer>().material = cuttedMaterial;
+            cuttedObj.GetComponent<Rigidbody>().useGravity = true;
+            cuttedObj.tag = "Disactive";
         }
 
         static void Cut_this_Face(int submesh, bool[] sides, int index1, int index2, int index3)

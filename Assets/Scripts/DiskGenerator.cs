@@ -9,6 +9,8 @@ public class DiskGenerator : MonoBehaviour
     static Vector2 pos_end;
     public GameObject diskPrefab;
     private Vector3 releasePosition;
+    private float mouseDownTime = 0.0f;
+    [SerializeField] float mouseDownDuaration;
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +21,39 @@ public class DiskGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(!GameController.gamePause)
+        {
+            if(GameController.diskCount > 0)
+            {
+                if(Input.GetMouseButtonDown(0))
+                {
+                    pos_start = Input.mousePosition;
+                }
+                if(Input.GetMouseButton(0))
+                {
+                    mouseDownTime += Time.deltaTime;
+                    pos_tmp = Input.mousePosition;
+                }
+                if(Input.GetMouseButtonUp(0))
+                {
+                    //マウスが離されたら射出方向を設定してディスク生成
+                    if(mouseDownTime > mouseDownDuaration)
+                    {
+                        pos_end = Input.mousePosition;
+                        releasePosition = GameObject.Find("Main Camera").transform.position;
+                        //GameObject disk = Instantiate(diskPrefab, new Vector3(releasePosition.x, releasePosition.y + 0.5f, releasePosition.z), Quaternion.identity) as GameObject;
+                        GameObject disk = Instantiate(diskPrefab, releasePosition, Quaternion.identity) as GameObject;
+                        disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
+                        if(!GameController.infinitytUsing)
+                        {
+                            GameController.diskCount -= 1;
+                        }
+                    }
+                    mouseDownTime = 0.0f;
+                }
+            }
+        }
+        /*
         //マウス入力取得
         if(Input.GetMouseButtonDown(0))
         {
@@ -38,8 +73,7 @@ public class DiskGenerator : MonoBehaviour
             GameObject disk = Instantiate(diskPrefab, releasePosition, Quaternion.identity) as GameObject;
             disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
         }
-
-
+        */
     }
 }
 
