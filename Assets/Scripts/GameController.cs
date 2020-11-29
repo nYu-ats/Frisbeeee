@@ -19,7 +19,7 @@ public class GameController : MonoBehaviour
     public static int diskCount = 20;
     private int playerStartPosition;
     private float[] stageLength = new float[4]{0.0f, 3071.0f, 9921.0f, 14101.0f};
-    private int stageNumber;
+    private static int stageNumber;
     private int stageProgressBarLength = 1000;
     [SerializeField] Image straightItemImage;
     [SerializeField] Image colorStopItemImage;
@@ -42,12 +42,14 @@ public class GameController : MonoBehaviour
     [SerializeField] Button[] menuButton;
     [SerializeField] Image[] menuImage;
     [SerializeField] Text[] menuText;
-    public static int reachStage;
+    //public static int reachStage;
     public int loadStage;
+    public static bool restartFlag;
     // Start is called before the first frame update
     void Start()
     {
-        stageNumber = 1;
+        stageNumber = loadStage;
+        LoadStage();
         playerStartPosition = (int) playerCamera.transform.position.z;
         stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 1.5f);
         foreach(Button obj in menuButton)
@@ -73,7 +75,7 @@ public class GameController : MonoBehaviour
         ColorBarUpdate();
         ItemGet();
         ItemConsume();
-        CheckPlayerStage();
+        //CheckPlayerStage();
     }
 
     /*void CalcScore()
@@ -248,6 +250,7 @@ public class GameController : MonoBehaviour
         }
     }
 
+    /*
     public void CheckPlayerStage()
     {
         float isStage = GameObject.FindWithTag("MainCamera").transform.position.z;
@@ -259,26 +262,35 @@ public class GameController : MonoBehaviour
             }
         }
     }
+    */
 
     public void SceneReturn()
     {
+        RestartGame();
         if(PlayerPrefs.HasKey("Stage"))
         {
-            if(PlayerPrefs.GetInt("Stage") < reachStage)
+            if(PlayerPrefs.GetInt("Stage") < stageNumber)
             {
-                PlayerPrefs.SetInt("Stage", reachStage);
+                PlayerPrefs.SetInt("Stage", stageNumber);
             }
         }
         else
         {
-            PlayerPrefs.SetInt("Stage", reachStage);
+            PlayerPrefs.SetInt("Stage", stageNumber);
         }
         SceneManager.LoadScene("Home");
     }
 
-    public void LoatStage()
+    public void LoadStage()
     {
-        Vector3 tmpPosition = GameObject.FindWithTag("MainCamera").transform.position;
-        GameObject.FindWithTag("MainCamera").transform.position = new Vector3(tmpPosition.x, tmpPosition.y, stageLength[reachStage]);
+        GameObject cameraObj = GameObject.FindWithTag("MainCamera"); 
+        cameraObj.transform.position = new Vector3(cameraObj.transform.position.x, cameraObj.transform.position.y, stageLength[stageNumber - 1]);
+    }
+
+    public void RestartStage()
+    {
+        RestartGame();
+        restartFlag = true;
+        LoadStage();
     }
 }

@@ -11,9 +11,7 @@ public class CameraMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cameraPosition = this.transform.position;
-        cameraRotation = this.transform.rotation;
-        positionZ = this.transform.position.z;
+        CameraPositionSet();
     }
 
     // Update is called once per frame
@@ -28,7 +26,22 @@ public class CameraMove : MonoBehaviour
             Time.timeScale = 1.0f;
         }
 
-        positionZ += moveSpeed * Time.deltaTime;
-        this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, positionZ);
+        if(GameController.restartFlag)
+        {
+            CameraPositionSet();
+            GameController.restartFlag = false;
+        }
+        else
+        {
+            positionZ += moveSpeed * Time.deltaTime;
+            this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, positionZ);
+        }
+    }
+
+    public void CameraPositionSet()
+    {
+        cameraPosition = this.transform.position;
+        cameraRotation = this.transform.rotation;
+        positionZ = this.transform.position.z;
     }
 }
