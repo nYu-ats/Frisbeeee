@@ -32,6 +32,7 @@ TagManager:
   - RotateY
   - RotateZ
   - GameManager
+  - SwitchFocus
   layers:
   - Default
   - TransparentFX

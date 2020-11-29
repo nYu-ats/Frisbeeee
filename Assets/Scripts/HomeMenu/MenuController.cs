@@ -18,7 +18,11 @@ public class MenuController : MonoBehaviour
         {
             PlayerPrefs.SetInt("Stage", 1);
         }
-        Debug.Log(PlayerPrefs.GetInt("Stage"));
+
+        if(!PlayerPrefs.HasKey("Guide"))
+        {
+            PlayerPrefs.SetInt("Guide", 1);
+        }
     }
 
     // Update is called once per frame

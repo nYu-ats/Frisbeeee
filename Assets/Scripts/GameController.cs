@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
-    public Camera playerCamera;
+    [SerializeField] Camera playerCamera;
     public Text scoreText;
     public Image stageProgressBar;
     public Text diskCountText;
@@ -45,6 +45,24 @@ public class GameController : MonoBehaviour
     //public static int reachStage;
     public int loadStage;
     public static bool restartFlag;
+    private bool displayGuide;
+    [SerializeField] float displayTime = 5.0f;
+    [SerializeField] Image guideFlickImage;
+    [SerializeField] Text guideFlickText;
+    [SerializeField] Image guideWhitePollImage;
+    [SerializeField] Text guideWhitePollText;
+    [SerializeField] Image guideColorPollImage;
+    [SerializeField] Text guideColorPollText;
+    [SerializeField] Image guideObstacleImage;
+    [SerializeField] Text guideObstacleText;
+    [SerializeField] Image guideGameOverImage;
+    [SerializeField] Text guideGameOverText;
+    [SerializeField] Image guideSwitchImage;
+    [SerializeField] Text guideSwitchText;
+    [SerializeField] GameObject guideSwitchFocus;
+    private GameObject focusObject;
+
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +82,15 @@ public class GameController : MonoBehaviour
         {
             obj.enabled = false;
         }
+
+        if(PlayerPrefs.GetInt("Guide") == 1)
+        {
+            displayGuide = true;
+        }
+        else
+        {
+            displayGuide = false;
+        }
     }
 
     // Update is called once per frame
@@ -75,6 +102,10 @@ public class GameController : MonoBehaviour
         ColorBarUpdate();
         ItemGet();
         ItemConsume();
+        if(displayGuide)
+        {
+            DisplayGuide();
+        }
         //CheckPlayerStage();
     }
 
@@ -283,8 +314,7 @@ public class GameController : MonoBehaviour
 
     public void LoadStage()
     {
-        GameObject cameraObj = GameObject.FindWithTag("MainCamera"); 
-        cameraObj.transform.position = new Vector3(cameraObj.transform.position.x, cameraObj.transform.position.y, stageLength[stageNumber - 1]);
+        playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
     }
 
     public void RestartStage()
@@ -293,4 +323,73 @@ public class GameController : MonoBehaviour
         restartFlag = true;
         LoadStage();
     }
+
+    private void DisplayGuide()
+    {
+        if(Mathf.Floor(playerCamera.transform.position.z) == 100)
+        {
+            guideFlickImage.enabled = true;
+            guideFlickText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideFlickImage, guideFlickText, displayTime));
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 200)
+        {
+            guideWhitePollImage.enabled = true;
+            guideWhitePollText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideWhitePollImage, guideWhitePollText, displayTime));
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 320)
+        {
+            guideColorPollImage.enabled = true;
+            guideColorPollText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideColorPollImage, guideColorPollText, displayTime));
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 520)
+        {
+            guideObstacleImage.enabled = true;
+            guideObstacleText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideObstacleImage, guideObstacleText, displayTime));
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 670)
+        {
+            guideGameOverImage.enabled = true;
+            guideGameOverText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideGameOverImage, guideGameOverText, displayTime));
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 3020)
+        {
+            guideSwitchImage.enabled = true;
+            guideSwitchText.enabled = true;
+            StartCoroutine(DisactivateGuide(guideSwitchImage, guideSwitchText, displayTime)); 
+        }
+
+        if(Mathf.Floor(playerCamera.transform.position.z) == 3020)
+        {
+            GameObject check = GameObject.FindWithTag("SwitchFocus");
+            if(check == null)
+            {
+                focusObject = Instantiate(guideSwitchFocus);
+                StartCoroutine(DisactivateFocusSwitch(focusObject, displayTime));
+            }
+        }
+    }
+
+    IEnumerator DisactivateGuide(Image image, Text text, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        image.enabled = false;
+        text.enabled = false;
+    }
+
+    IEnumerator DisactivateFocusSwitch(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(focusObject);
+    }
+
 }
