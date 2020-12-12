@@ -5,27 +5,33 @@ using UnityEngine;
 public class RepeatBackGroundController : MonoBehaviour
 {
     [SerializeField] GameObject repeatBlock;
-    [SerializeField] float blockLength;
+    
+    //ブロックを並べる間隔(ブロック長)
+    [SerializeField] float generateInterval;
+    
+    //ブロックを並べる初期位置
     private float startPosition = 0.0f;
-    private int repeatCount = 3;
-    // Start is called before the first frame update
+
+    //何個ブロック並べるか
+    private int repeatCount = 2;
     void Start()
     {
+        //初期位置z=0で1ブロック長おきにブロック生成
         float createPosition = startPosition;
         for(int i = 0; i < repeatCount; i++)
         {
             Instantiate(repeatBlock, new Vector3(0.0f, 0.0f, createPosition), Quaternion.identity);
-            createPosition += blockLength;
+            createPosition += generateInterval;
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
+        //シーン中のブロック数が規定個数を下回ったら、新しいブロック生成
         GameObject[] currentGameObjects = GameObject.FindGameObjectsWithTag("Wall");
         if(currentGameObjects.Length < repeatCount)
         {
-            Instantiate(repeatBlock, new Vector3(0.0f, 0.0f, blockLength), Quaternion.identity);
+            Instantiate(repeatBlock, new Vector3(0.0f, 0.0f, generateInterval), Quaternion.identity);
         }
     }
 }

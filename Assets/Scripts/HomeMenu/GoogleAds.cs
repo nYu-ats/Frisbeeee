@@ -5,35 +5,31 @@ using GoogleMobileAds.Api;
 
 public class GoogleAds : MonoBehaviour
 {
-    private InterstitialAd interstitial;
+    //広告表示の頻度
+    [SerializeField] int adDisplayFrequency = 5;
+    private static int homeCount = 0;
 
-    // Start is called before the first frame update
+    //ホーム画面の読み込み回数に応じて広告を表示
     void Start()
     {
-        RequestInterstitial();
-        if(!PlayerPrefs.HasKey("CountForAdd"))
+        homeCount += 1;
+        if(homeCount % adDisplayFrequency == 0)
         {
-            PlayerPrefs.SetInt("CountForAdd", 0);
-        }
-        PlayerPrefs.SetInt("CountForAdd", PlayerPrefs.GetInt("CountForAdd") + 1);
-        Debug.Log(PlayerPrefs.GetInt("CountForAdd"));
-        if(PlayerPrefs.GetInt("CountForAdd") % 5 == 0)
-        {
-            this.interstitial.Show();
+            RequestInterstitial();
+            homeCount = 1;
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    private InterstitialAd interstitial;
     private void RequestInterstitial()
     {
+        //インタースティシャルオブジェクトの作成
         string appId = "ca-app-pub-5395055065464098/8141889331";
         this.interstitial = new InterstitialAd(appId);
+        
+        //広告の読み込み
         AdRequest request = new AdRequest.Builder().Build();
-        this.interstitial.LoadAd(request);        
+        this.interstitial.LoadAd(request);
+        //広告表示
+        this.interstitial.Show();      
     }
 }
