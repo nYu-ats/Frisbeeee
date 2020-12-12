@@ -129,8 +129,8 @@ public class MenuController : MonoBehaviour
     //どの画面から押されたかによって非表示化する対象を分岐させる
     public void OnReturnButtonClicked(int flag)
     {
-        //ステージセレクト画面から押された場合 : flag1
-        //オプション設定画面から押された場合 : flag2
+        //ステージセレクト画面から押された場合 : flag -> 1
+        //オプション設定画面から押された場合 : flag -> 2
         if(flag == 1)
         {
             foreach(Button obj in stageButton)

@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class RepeatBackGroundController : MonoBehaviour
 {
+    //ステージに配置するブロックの数
     [SerializeField] GameObject repeatBlock;
-    
+
     //ブロックを並べる間隔(ブロック長)
     [SerializeField] float generateInterval;
     
