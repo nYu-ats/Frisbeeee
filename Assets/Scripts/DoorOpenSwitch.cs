@@ -4,21 +4,15 @@ using UnityEngine;
 
 public class DoorOpenSwitch : MonoBehaviour
 {
-    private GameObject[] triangleDoors = new GameObject[4];
+    [SerializeField] GameObject switchPushedSound;
+    [SerializeField] GameObject doorRight;
+    [SerializeField] GameObject doorLeft;
+    [SerializeField] GameObject switchObj1;
+    [SerializeField] GameObject switchObj2;
+    [SerializeField] Material afterPushedMat;
+    private float delayTIme = 0.5f;
     void Start()
     {
-        if(this.gameObject.tag == "Switch1")
-        {
-            triangleDoors[0] = this.gameObject.transform.parent.gameObject.transform.GetChild(0).gameObject;
-            triangleDoors[1] = this.gameObject.transform.parent.gameObject.transform.GetChild(1).gameObject;
-            triangleDoors[2] = this.gameObject.transform.parent.gameObject.transform.GetChild(2).gameObject;
-            triangleDoors[3] = this.gameObject.transform.parent.gameObject.transform.GetChild(3).gameObject;
-        }
-        else if(this.gameObject.tag == "Switch2")
-        {
-            triangleDoors[0] = this.gameObject.transform.parent.gameObject.transform.GetChild(0).gameObject;
-            triangleDoors[1] = this.gameObject.transform.parent.gameObject.transform.GetChild(1).gameObject;
-        }
     }
 
     // Update is called once per frame
@@ -33,16 +27,19 @@ public class DoorOpenSwitch : MonoBehaviour
         {
             if(this.gameObject.tag == "Switch1")
             {
-                triangleDoors[0].GetComponent<Animator>().SetBool("OpenDoor", true);
-                triangleDoors[1].GetComponent<Animator>().SetBool("OpenDoor", true);
-                triangleDoors[2].GetComponent<Animator>().SetBool("OpenDoor", true);
-                triangleDoors[3].GetComponent<Animator>().SetBool("OpenDoor", true);
-            }
-            else if(this.gameObject.tag == "Switch1")
-            {
-                triangleDoors[0].GetComponent<Animator>().SetBool("OpenDoor", true);
-                triangleDoors[1].GetComponent<Animator>().SetBool("OpenDoor", true);     
+                doorRight.GetComponent<Animator>().SetBool("OpenDoor", true);
+                doorLeft.GetComponent<Animator>().SetBool("OpenDoor", true);
+                Instantiate(switchPushedSound, this.transform.position, Quaternion.Euler(0, 0, 0));
+                this.gameObject.GetComponent<MeshRenderer>().material = afterPushedMat;
+                StartCoroutine(DisableSwitch(delayTIme));
             }
         }
+    }
+
+    IEnumerator DisableSwitch(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        switchObj1.tag = "Wall";
+        switchObj2.tag = "Wall";
     }
 }

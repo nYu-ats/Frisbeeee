@@ -202,6 +202,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cuttedMaterial: {fileID: 2100000, guid: 9c3b338d1a2856f439c1f74e889dd139, type: 2}
+  isLive: 1
+  globalPositionZ: 0
+  diskIncreasePopUp: {fileID: 2972222002537375091, guid: 51b821d5800c6dd449db77e0b9b05386,
+    type: 3}
+  blueIncreasePopUp: {fileID: 3563507229730241989, guid: fdb918a87a9492542b66357a4bb399d2,
+    type: 3}
+  redIncreasePopUp: {fileID: 6439496845529231838, guid: f4e7e79d60760b046a3900fc11ca0ef4,
+    type: 3}
 --- !u!54 &7033392922131149190
 Rigidbody:
   m_ObjectHideFlags: 0

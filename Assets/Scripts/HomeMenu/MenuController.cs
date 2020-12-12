@@ -19,6 +19,7 @@ public class MenuController : MonoBehaviour
     [SerializeField] Image[] guideChecked;
     private int onFlag = 1;
     private int offFlag = 0;
+    private int stageCount = 3;
 
     private static int startStage;
 
@@ -39,13 +40,11 @@ public class MenuController : MonoBehaviour
         {
             PlayerPrefs.SetInt("Volume", 1);
         }
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(PlayerPrefs.GetInt("Volume"));
     }
 
     public void OnStartButtonClicked()
@@ -63,6 +62,13 @@ public class MenuController : MonoBehaviour
         foreach(Text obj in stageText)
         {
             obj.enabled = true;
+        }
+
+        for(int i = PlayerPrefs.GetInt("Stage"); i < stageCount; i++)
+        {
+            stageImage[i].color = new Color(255.0f, 255.0f, 255.0f, 0.1f);
+            stageText[i].color = new Color(255.0f, 255.0f, 255.0f, 0.1f);
+            stageButton[i].enabled = false;
         }
     }
 

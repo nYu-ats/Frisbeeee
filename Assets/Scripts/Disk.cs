@@ -31,6 +31,9 @@ public class Disk : MonoBehaviour
     [SerializeField] int diskIncreaseNumberPoll;
     [SerializeField] int colorIncreaseNumberBall;
     [SerializeField] int colorIncreaseNumberPoll;
+    [SerializeField] GameObject pollHitSound;
+    [SerializeField] GameObject wallHitSound;
+
 
     void Start()
     {
@@ -149,7 +152,7 @@ public class Disk : MonoBehaviour
                 GameController.colorBarPosition -= colorIncreaseNumberPoll;
                 GameController.colorMarkPosition -= colorIncreaseNumberPoll;
             }
-            audioPlayer.PlayOneShot(audioClipPoll);
+            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
@@ -160,34 +163,39 @@ public class Disk : MonoBehaviour
                 GameController.colorBarPosition += colorIncreaseNumberPoll;
                 GameController.colorMarkPosition += colorIncreaseNumberPoll;
             }
-            audioPlayer.PlayOneShot(audioClipPoll);
+            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
         else if(collision.gameObject.tag == "WhitePoll")
         {
             GameController.diskCount += diskIncreaseNumberPoll;
-            audioPlayer.PlayOneShot(audioClipPoll);
+            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
-        else if(collision.transform.root.gameObject.tag == "Wall" | collision.transform.root.gameObject.tag == "Switch1" | collision.transform.root.gameObject.tag == "Switch2")
+        /*else if(collision.transform.root.gameObject.tag == "Wall" & collision.gameObject.tag != "Switch1")
         {
-            GameObject.FindWithTag("StageAudio").GetComponent<AudioSource>().PlayOneShot(audioDestroySelf);
+            Instantiate(wallHitSound, collisionPosition, Quaternion.Euler(effectRotation));
             Instantiate(effectDiskCrush, collisionPosition, Quaternion.Euler(effectRotation));
             Destroy(this.gameObject);
-        }
+        }*/
     }
 
+    
+    
     void OnCollisionEnter(Collision collision)
     {
-       if(collision.transform.root.gameObject.tag == "Wall" | collision.transform.root.gameObject.tag == "Switch1" | collision.transform.root.gameObject.tag == "Switch2")
+        if(collision.transform.root.gameObject.tag == "Wall")
         {
             collisionPosition = this.transform.position;
-            GameObject.FindWithTag("StageAudio").GetComponent<AudioSource>().PlayOneShot(audioDestroySelf);
+            if(collision.gameObject.tag != "Switch1")
+            {
+                Instantiate(wallHitSound, collisionPosition, Quaternion.Euler(effectRotation));
+            }
             Instantiate(effectDiskCrush, collisionPosition, Quaternion.Euler(effectRotation));
             Destroy(this.gameObject);
         } 
-    }
+    }    
 }
 

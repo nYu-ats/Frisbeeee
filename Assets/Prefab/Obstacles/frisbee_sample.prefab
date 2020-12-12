@@ -229,6 +229,13 @@ MonoBehaviour:
   diskIncreaseNumberPoll: 3
   colorIncreaseNumberBall: 1
   colorIncreaseNumberPoll: 1
+  pollHitSound: {fileID: 6710448987413146347, guid: b6e12047b0c064043b56affb59d3a468,
+    type: 3}
+  wallHitSound: {fileID: 6710448987413146347, guid: a0ab4886fec4b4041b19f7373365ef1c,
+    type: 3}
+  diskIncreasePopUp: {fileID: 2972222002537375091, guid: 51b821d5800c6dd449db77e0b9b05386,
+    type: 3}
+  uiCanvas: {fileID: 0}
 --- !u!65 &5381260623983104098
 BoxCollider:
   m_ObjectHideFlags: 0

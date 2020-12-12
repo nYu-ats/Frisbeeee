@@ -13,6 +13,11 @@ public class Polls : MonoBehaviour
     [SerializeField] Material cuttedMaterial;
     public bool isLive = true;
     public float globalPositionZ;
+    [SerializeField] GameObject diskIncreasePopUp;
+    [SerializeField] GameObject blueIncreasePopUp;
+    [SerializeField] GameObject redIncreasePopUp;
+    private GameObject uiCanvas;
+
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +34,7 @@ public class Polls : MonoBehaviour
            victim.GetComponent<Rigidbody>().AddTorque(30, 0, 0, ForceMode.Impulse); 
         }
         globalPositionZ = this.gameObject.transform.root.position.z;
+        uiCanvas = GameObject.Find("Canvas");
     }
 
     // Update is called once per frame
@@ -46,6 +52,21 @@ public class Polls : MonoBehaviour
             GetComponent<CapsuleCollider>().enabled = false;
             BLINDED_AM_ME.MeshCut.Cut(victim, anchorpoint, normalDirection , capMaterial, cuttedMaterial, globalPositionZ);
             Destroy(victim);
+            if(this.gameObject.tag == "WhitePoll")
+            {
+                GameObject popUp = Instantiate(diskIncreasePopUp);
+                popUp.transform.SetParent(uiCanvas.transform, false);
+            }
+            else if(this.gameObject.tag == "RedPoll")
+            {
+                GameObject popUp = Instantiate(redIncreasePopUp);
+                popUp.transform.SetParent(uiCanvas.transform, false);
+            }
+            else if(this.gameObject.tag == "BluePoll")
+            {
+                GameObject popUp = Instantiate(blueIncreasePopUp);
+                popUp.transform.SetParent(uiCanvas.transform, false);
+            }
         }
     }
 

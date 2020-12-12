@@ -11,11 +11,13 @@ public class DiskGenerator : MonoBehaviour
     private Vector3 releasePosition;
     private float mouseDownTime = 0.0f;
     [SerializeField] float mouseDownDuaration;
+    [SerializeField] GameObject uiCanvas;
+    [SerializeField] GameObject diskDecreasePopUp;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -47,6 +49,8 @@ public class DiskGenerator : MonoBehaviour
                         if(!GameController.infinitytUsing)
                         {
                             GameController.diskCount -= 1;
+                            GameObject popUp = Instantiate(diskDecreasePopUp);
+                            popUp.transform.SetParent(uiCanvas.transform, false);
                         }
                     }
                     mouseDownTime = 0.0f;

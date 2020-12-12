@@ -24,6 +24,7 @@ public class Item : MonoBehaviour
         }
         else if(this.transform.parent.gameObject.tag == "Infinity" & !GameController.diskInfinityItem)
         {
+            Debug.Log("ok");
             GameController.diskInfinityItem = true;
             Destroy(this.transform.parent.gameObject);
         }

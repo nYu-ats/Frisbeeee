@@ -18,12 +18,17 @@ public class GameController : MonoBehaviour
     public static float colorMarkPosition = 0.0f;
     public static int diskCount = 20;
     private int playerStartPosition;
-    private float[] stageLength = new float[4]{0.0f, 3071.0f, 9921.0f, 14101.0f};
-    private static int stageNumber;
+    private float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
+    public static int stageNumber;
     private int stageProgressBarLength = 1000;
     [SerializeField] Image straightItemImage;
+    [SerializeField] Button straightItemButton;
     [SerializeField] Image colorStopItemImage;
+    [SerializeField] Button colorStopItemButton;
+
     [SerializeField] Image diskInfinityItemImage;
+    [SerializeField] Button diskInfinityItemButton;
+
     public static bool straightItem = false;
     public static bool colorStopItem = false;
     public static bool diskInfinityItem = false;
@@ -61,8 +66,14 @@ public class GameController : MonoBehaviour
     [SerializeField] Text guideSwitchText;
     [SerializeField] GameObject guideSwitchFocus;
     private GameObject focusObject;
-
-    
+    [SerializeField] Image gameOverBackground;
+    [SerializeField] Text gameOverText;
+    [SerializeField] float speedDecrease = 1.0f;
+    [SerializeField] Image gameClearBackground;
+    [SerializeField] Text gameClearText;
+    [SerializeField] GameObject gameClearSound;
+    private bool gameClearFlag = false;
+ 
     // Start is called before the first frame update
     void Start()
     {
@@ -106,16 +117,46 @@ public class GameController : MonoBehaviour
         {
             DisplayGuide();
         }
-        //CheckPlayerStage();
+
+        /*if(diskCount <= 0)
+        {
+            gameOverBackground.enabled = true;
+            if(playerCamera.GetComponent<CameraMove>().moveSpeed > 0.0f)
+            {
+                playerCamera.GetComponent<CameraMove>().moveSpeed -= speedDecrease;
+            }
+            else
+            {
+                gameOverText.enabled = true;
+                Invoke("SceneReturn", 3.0f);
+            }
+        }*/
+
+        if(playerCamera.transform.position.z >= stageLength[3])
+        {
+            if(playerCamera.GetComponent<CameraMove>().moveSpeed > 0.0f)
+            {
+                playerCamera.GetComponent<CameraMove>().moveSpeed -= speedDecrease;
+            }
+            else
+            {
+                gameClearText.enabled = true;
+                gameClearBackground.enabled = true;
+                if(!gameClearFlag)
+                {
+                    Instantiate(gameClearSound, playerCamera.transform.position, Quaternion.Euler(0, 0, 0));
+                    gameClearFlag = true;
+                }
+                Invoke("SceneReturn", 5.0f);
+            }
+
+        }
     }
 
-    /*void CalcScore()
+    public static bool ReturnDiskStatus()
     {
-        float score = ((int) playerCamera.transform.position.z) - playerStartPosition;
-        scoreText.text = score + "m"; 
+        return diskCount > 0;
     }
-    */
-
     void StageProgress()
     {
         if(stageNumber == 1)
@@ -155,16 +196,19 @@ public class GameController : MonoBehaviour
         if(straightItem)
         {
             straightItemImage.enabled = true;
+            straightItemButton.enabled = true;
             //straightItemImage.color = new Color(straightItemImage.color.r, straightItemImage.color.g, straightItemImage.color.b, 255);
         }
         else if(diskInfinityItem)
         {
             diskInfinityItemImage.enabled = true;
+            diskInfinityItemButton.enabled = true;
             //diskInfinityItemImage.color = new Color(diskInfinityItemImage.color.r, diskInfinityItemImage.color.g, diskInfinityItemImage.color.b, 255);
         }
         else if(colorStopItem)
         {
             colorStopItemImage.enabled = true;
+            colorStopItemButton.enabled = true;
             //colorStopItemImage.color = new Color(colorStopItemImage.color.r, colorStopItemImage.color.g, colorStopItemImage.color.b, 255);
         }
     }
@@ -309,7 +353,15 @@ public class GameController : MonoBehaviour
         {
             PlayerPrefs.SetInt("Stage", stageNumber);
         }
+        InitializeGameStatus();
         SceneManager.LoadScene("Home");
+    }
+
+    private void InitializeGameStatus()
+    {
+        diskCount = 20;
+        colorBarPosition = 0.0f;
+        colorMarkPosition = 0.0f;
     }
 
     public void LoadStage()
@@ -321,6 +373,7 @@ public class GameController : MonoBehaviour
     {
         RestartGame();
         restartFlag = true;
+        InitializeGameStatus();
         LoadStage();
     }
 
@@ -391,5 +444,4 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(delay);
         Destroy(focusObject);
     }
-
 }
