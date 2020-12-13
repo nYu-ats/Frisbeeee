@@ -2519,7 +2519,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38fe4df95f86b15488013005400f96d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  adjustVolume: 10
+  adjustVolume: 5
   distanceY: 10
   distanceZ: -10
 --- !u!82 &1038654207

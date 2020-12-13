@@ -157,6 +157,11 @@ public class GameController : MonoBehaviour
     {
         return diskCount > 0;
     }
+
+    public static bool ReturnRestartStatus()
+    {
+        return restartFlag;
+    }
     void StageProgress()
     {
         if(stageNumber == 1)
@@ -308,6 +313,11 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public static bool ReturnPauseStatus()
+    {
+        return gamePause;
+    }
+
     public void RestartGame()
     {
         gamePause = false;
@@ -375,6 +385,11 @@ public class GameController : MonoBehaviour
         restartFlag = true;
         InitializeGameStatus();
         LoadStage();
+    }
+
+    public static void ReadyToRestart()
+    {
+        restartFlag = false;
     }
 
     private void DisplayGuide()

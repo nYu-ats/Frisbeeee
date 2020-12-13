@@ -2,25 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioMove : MonoBehaviour
+//ゲームBGM再生用のスクリプト
+public class GamePlayBGM : MonoBehaviour
 {
     private Vector3 cameraPosition;
-    [SerializeField] float adjustVolume = 10.0f;
+    //音量設定の最大値
     private int maxVolume = 2;
-    [SerializeField] float distanceY = 100.0f;
-    [SerializeField] float distanceZ = -100.0f;
+    //BGMが大きすぎるので、調整用の変数
+    [SerializeField] float adjustVolume;
+    [SerializeField] float distanceY;
+    [SerializeField] float distanceZ;
 
-    // Start is called before the first frame update
     void Start()
     {
+        //ゲームスタート時に音量を設定
         this.gameObject.GetComponent<AudioSource>().volume = PlayerPrefs.GetInt("Volume") / maxVolume / adjustVolume;
-        cameraPosition = GameObject.FindWithTag("MainCamera").transform.position;
-        this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y + distanceY, cameraPosition.z + distanceZ);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        //カメラと一定距離をとりながら追従する
         cameraPosition = GameObject.FindWithTag("MainCamera").transform.position;
         this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y + distanceY, cameraPosition.z + distanceZ); 
     }
