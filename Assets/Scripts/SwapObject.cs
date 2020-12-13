@@ -2,26 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectChange : MonoBehaviour
+/*
+一定時間置きにポールの色を入れ替えるスクリプト
+空の親オブジェクトにアタッチする
+*/
+public class SwapObject : MonoBehaviour
 {
+    //赤青白それぞれのprefabを入れておく
     [SerializeField] GameObject childObjBlue;
     [SerializeField] GameObject childObjRed;
     [SerializeField] GameObject childObjWhite;
-    [SerializeField] float changeSpan;
-    [SerializeField] string startColor;
-    [SerializeField] string changedColor;
-    [SerializeField] float distance;
-    private int thisChildCount;
-    private float time;
-    private bool changeFlag = true;
     private GameObject startObj;
     private GameObject changedObj;
-    private Transform instantiatePosition;
+    //初期のポールの色
+    [SerializeField] string startColor;
+    //入れ替え後のポールの色
+    [SerializeField] string changedColor;
 
-    // Start is called before the first frame update
+    //入れ替えのスパン
+    [SerializeField] float changeSpan;
+    //子オブジェクトの数
+    private int thisChildCount;
+    private float time;
+    //初期オブジェクト <-> 切替後オブジェクトの切替フラグ
+    private bool changeFlag = true;
+    //ベースとなるオブジェクトの位置
+    private Transform instantiatePosition;
+    //ベースとなるオブジェクトからの距離
+    [SerializeField] float distance;
+
+
     void Start()
     {
         instantiatePosition = this.gameObject.transform.GetChild(0).gameObject.transform;
+        //インスペクターからの指定の色に従って初期ポールをセット、生成する
         if(startColor == "Blue")
         {
             startObj = childObjBlue;
@@ -38,6 +52,7 @@ public class ObjectChange : MonoBehaviour
             ObjectInstantiate(this.gameObject.tag, startObj);
         }
 
+        //インスペクターからの指定の色に従って切替後のポールをセット
         if(changedColor == "Blue")
         {
             changedObj = childObjBlue;
@@ -51,20 +66,26 @@ public class ObjectChange : MonoBehaviour
             changedObj = childObjWhite;
         }
         time = 0;
+        //ポールを含めた子オブジェクトの数をセット
         thisChildCount = this.gameObject.transform.childCount;
     }
 
-    // Update is called once per frame
+
     void Update()
     {
+        //子オブジェクトの数が変わってない = ポールが破壊されていない時のみ、入れ替えの処理を行う
         if(this.gameObject.transform.childCount == thisChildCount)
         {
             time += Time.deltaTime;
             if(time >= changeSpan)
             {
+                //切替フラグがtrue -> 切替後オブジェクトを生成
+                //切替フラグがfalse -> 初期オブジェクトを生成
                 if(changeFlag == true)
                 {
+                    //既存オブジェクトを消去
                     Destroy(this.gameObject.transform.GetChild(1).gameObject);
+                    //新しいオブジェクトを生成
                     ObjectInstantiate(this.gameObject.tag, changedObj);
                     time = 0;
                     changeFlag = false;
@@ -81,15 +102,19 @@ public class ObjectChange : MonoBehaviour
         }
 }
 
+    //受け取ったオブジェクトを生成する処理
     void ObjectInstantiate(string tag, GameObject obj)
     {
+        //タグで縦向きか横向きか判断
         if(this.gameObject.tag == "VerticaleMove")
             {
+                //縦向きの場合は、ベースオブジェクトから縦方向の一定距離にオブジェクトを生成
                 GameObject childPoll = Instantiate(obj, new Vector3(instantiatePosition.position.x, this.instantiatePosition.position.y + distance, instantiatePosition.position.z), Quaternion.Euler(0, 0, 0));
                 childPoll.transform.parent = this.gameObject.transform;
             }
         else if(this.gameObject.tag == "HorizonMove")
             {
+                //横向きの場合は、ベースオブジェクトから横方向の一定距離にオブジェクトを生成
                 GameObject childPoll = Instantiate(obj, new Vector3(instantiatePosition.position.x + distance, instantiatePosition.position.y, instantiatePosition.position.z), Quaternion.Euler(0, 0, 90));
                 childPoll.transform.parent = this.gameObject.transform;
             }
