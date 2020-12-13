@@ -37,7 +37,7 @@ public class Disk : MonoBehaviour
 
     void Start()
     {
-        cameraSpeed = GameObject.FindWithTag("MainCamera").gameObject.GetComponent<CameraMove>().moveSpeed;
+        cameraSpeed = CameraMove.ReturnCameraSpeed();
         //初期で加える力を射出方向に分解
         addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
         addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));

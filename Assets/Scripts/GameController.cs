@@ -118,27 +118,19 @@ public class GameController : MonoBehaviour
             DisplayGuide();
         }
 
-        /*if(diskCount <= 0)
+        if(diskCount <= 0)
         {
             gameOverBackground.enabled = true;
-            if(playerCamera.GetComponent<CameraMove>().moveSpeed > 0.0f)
-            {
-                playerCamera.GetComponent<CameraMove>().moveSpeed -= speedDecrease;
-            }
-            else
+            if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameOverText.enabled = true;
                 Invoke("SceneReturn", 3.0f);
             }
-        }*/
+        }
 
         if(playerCamera.transform.position.z >= stageLength[3])
         {
-            if(playerCamera.GetComponent<CameraMove>().moveSpeed > 0.0f)
-            {
-                playerCamera.GetComponent<CameraMove>().moveSpeed -= speedDecrease;
-            }
-            else
+            if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameClearText.enabled = true;
                 gameClearBackground.enabled = true;
@@ -149,7 +141,6 @@ public class GameController : MonoBehaviour
                 }
                 Invoke("SceneReturn", 5.0f);
             }
-
         }
     }
 

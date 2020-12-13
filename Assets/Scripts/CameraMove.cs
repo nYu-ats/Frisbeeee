@@ -8,7 +8,7 @@ using UnityEngine;
 */
 public class CameraMove : MonoBehaviour
 {
-    public float moveSpeed;
+    public static float moveSpeed;
     private Vector3 cameraPosition;
     private Quaternion cameraRotation;
     private float positionZ;
@@ -16,6 +16,8 @@ public class CameraMove : MonoBehaviour
     [SerializeField] float stayTime;
     //カメラを移動させるか、待機させるか判断用のフラグ
     private bool proceedFlag = false;
+    //カメラを減速させる速度
+    private float decreaseSpeed = 0.5f;
 
     void Start()
     {
@@ -25,8 +27,12 @@ public class CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //ステージ1のみmoveSpeedを5に設定
-        //ステージ2と3はSpeedを10にする
+        /*
+        カメラの移動速度を調整する処理
+        ステージ1 -> moveSpeed : 5
+        ステージ2と3はSpeed : 10
+        ディスクが0(ゲームオーバー)になったら、カメラの動きを止める
+        */
         if(GameController.ReturnDiskStatus())
         {
             if(GameController.stageNumber == 1)
@@ -36,6 +42,13 @@ public class CameraMove : MonoBehaviour
             else
             {
                 moveSpeed = 10.0f;
+            }
+        }
+        else
+        {
+            if(moveSpeed > 0)
+            {
+                moveSpeed -= decreaseSpeed;
             }
         }
 
@@ -60,6 +73,7 @@ public class CameraMove : MonoBehaviour
             GameController.ReadyToRestart();
         }
         
+        //カメラを移動させる処理
         if(proceedFlag)
         {
             positionZ += moveSpeed * Time.deltaTime;
@@ -77,5 +91,11 @@ public class CameraMove : MonoBehaviour
         positionZ = this.transform.position.z;
         yield return new WaitForSeconds(stayTime);
         proceedFlag = true;
+    }
+
+    //外部へカメラの速度を通知する
+    public static float ReturnCameraSpeed()
+    {
+        return moveSpeed;
     }
 }
