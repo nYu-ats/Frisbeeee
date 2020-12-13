@@ -2,37 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+アイテムゲット時の処理
+*/
 public class Item : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    //アイテム獲得時の音
+    [SerializeField] GameObject itemGetSound;
+    void OnTriggerEnter(Collider collision)
     {
-        
+        //衝突対象がDiskの場合のみアイテムゲット
+        if(collision.gameObject.tag == "Disk")
+        {
+            //アイテム未所持かどうか判断
+            if(!GameController.ReturnItemStatus(this.transform.parent.gameObject.tag))
+            {
+                this.GetItem(this.transform.parent.gameObject.tag);
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    //アイテムゲット時の処理
+    private void GetItem(string item)
     {
-    }
-
-    void OnTriggerEnter()
-    {
-        if(this.transform.parent.gameObject.tag == "Straight" & !GameController.straightItem)
-        {
-            GameController.straightItem = true;
-            Destroy(this.transform.parent.gameObject);
-        }
-        else if(this.transform.parent.gameObject.tag == "Infinity" & !GameController.diskInfinityItem)
-        {
-            Debug.Log("ok");
-            GameController.diskInfinityItem = true;
-            Destroy(this.transform.parent.gameObject);
-        }
-        else if(this.transform.parent.gameObject.tag == "ColorStop" & !GameController.colorStopItem)
-        {
-            GameController.colorStopItem = true;
-            Destroy(this.transform.parent.gameObject);
-        }
+        //アイテムを所持状態にする
+        GameController.GetItem(item);
+        //効果音再生
+        Instantiate(itemGetSound, this.transform.position, Quaternion.Euler(0, 0, 0));
+        //自身を消去
+        Destroy(this.transform.parent.gameObject);
     }
 
 }
