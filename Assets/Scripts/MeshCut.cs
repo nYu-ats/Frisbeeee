@@ -14,7 +14,7 @@ namespace BLINDED_AM_ME
             public List<int>      triangles = new List<int>();
             public List<List<int>> subIndices = new List<List<int>>();
 
-            //各オブジェクト構成要素を初期化するメソッド
+            //初期化
             public void ClearAll()
             {
                 vertices.Clear();
@@ -24,7 +24,7 @@ namespace BLINDED_AM_ME
                 subIndices.Clear();
             }
 
-            //各オブジェクト構成要素を追加するメソッド
+            //カット後のmeshを左と右それぞれに追加するメソッド
             public void AddTriangle(int p1, int p2, int p3, int submesh)
             {
                 int base_index = vertices.Count;
@@ -50,7 +50,7 @@ namespace BLINDED_AM_ME
                 uvs.Add(victim_mesh.uv[p3]);
             }
 
-            //AddTriangleメソッドをオーバーロード、FillCapメソッドで利用する
+            //AddTriangleメソッドをオーバーロード、FillCapで利用
             public void AddTriangle(Vector3[] points3, Vector3[] normals3, Vector2[] uvs3, Vector3 faceNormal, int submesh)
             {
                 Vector3 calculated_normal = Vector3.Cross((points3[1] - points3[0]).normalized, (points3[2] - points3[0]).normalized);
@@ -91,7 +91,7 @@ namespace BLINDED_AM_ME
 
         }
 
-        //オブジェクトを構成するメッシュの入れ物を左右それぞれ作る
+        //カット後のメッシュの入れ物を左右それぞれ作る
         private static MeshCutSide left_side = new MeshCutSide();
         private static MeshCutSide right_side = new MeshCutSide();
         //カットする平面
@@ -101,15 +101,15 @@ namespace BLINDED_AM_ME
         //切断により新たに生成される頂点を格納するための配列
         private static List<Vector3> new_vertices = new List<Vector3>();
 
-        //カット処理全体を行うメソッド
+        //カット処理
         public static GameObject[] Cut(GameObject victim, Vector3 anchorPoint, Vector3 normalDirection, Material capMaterial, Material cuttedMaterial, float globalPosisionZ)
         {
-            //法線とグローバルでのアンカーポイントを元にカットする平面を定義
+            //法線とグローバル座標を元にカットする平面を決定
             blade = new Plane(
                 victim.transform.InverseTransformDirection(-normalDirection),
                 victim.transform.InverseTransformPoint(anchorPoint)
             );
-            //カット対象オブジェクトのメッシュ取得
+            //カット対象のメッシュを格納
             victim_mesh = victim.GetComponent<MeshFilter>().mesh;
             //カット後の左右のオブジェクト、新頂点リストを初期化
             new_vertices.Clear();
@@ -120,14 +120,20 @@ namespace BLINDED_AM_ME
             int[] indices;//サブメッシュのインデックスを格納する配列
             int p1,p2,p3;
 
-            //メッシュに含まれるサブメッシュの数だけループ処理
+            /*
+            複数マテリアルが付けられている場合、サブメッシュがマテリアルと同じ数だけある
+            なのでサブメッシュの数だけ振り分け処理をループさせる
+            */
             for (int sub = 0; sub < victim_mesh.subMeshCount; sub++)
             {
                 indices = victim_mesh.GetIndices(sub);
                 left_side.subIndices.Add(new List<int>());  // 左側に振り分けられるサブメッシュ
                 right_side.subIndices.Add(new List<int>()); // 右側に振り分けられるサブメッシュ
 
-                //各サブメッシュに対して構成頂点がカット平面の左右のどちらに存在するかによってleft_side or right_sideに振り分ける or カット処理
+                /*
+                頂点がカット平面の左右のどちらに存在するかによって左側 or 右側に振り分ける
+                三角形の頂点が平面をまたぐ場合、カット処理を行う
+                */
                 for (int i = 0; i < indices.Length; i += 3)
                 {
                     p1 = indices[i + 0];
@@ -151,31 +157,28 @@ namespace BLINDED_AM_ME
                     }
                     else
                     {
-                        //三角形を構成する頂点がカット面の左右にばらけていた場合にカット処理
-                        Cut_this_Face(sub, sides, p1, p2, p3);
+                        Cut_this_Face(sub, sides, p1, p2, p3); //三角形を構成する頂点がカット面の左右それぞれに存在していた場合にカット処理
                     }
                 }
             }
 
-            //対象オブジェクトを構成するマテリアルの配列を取得
-            Material[] mats = victim.GetComponent<MeshRenderer>().sharedMaterials;
-            //カット面を構成するためのマテリアルがマテリアル配列の最後の要素と一致しない場合
+            Material[] mats = victim.GetComponent<MeshRenderer>().sharedMaterials; //対象オブジェクトを構成するマテリアルの配列を取得
+            
+            //カット面を埋めるためのマテリアルを追加する
             if (mats[mats.Length - 1].name != capMaterial.name)
             {
                 //カット面用のサブメッシュ追加
                 left_side.subIndices.Add(new List<int>());
                 right_side.subIndices.Add(new List<int>());
-                //サブメッシュと配列要素数を一致させるため
-                Material[] newMats = new Material[mats.Length + 1];
+                Material[] newMats = new Material[mats.Length + 1]; //サブメッシュと配列要素数を一致させるため
                 mats.CopyTo(newMats, 0);
                 newMats[mats.Length] = capMaterial;
                 mats = newMats;
             }
 
-            //カットにより新しく生成された頂点からカット面を埋める
-            Capping();
+            Capping(); 
 
-            //ここまででカットにより新しくできた左側のメッシュを配列化して再セット
+            //ここまでの処理でカットにより新しくできた左右それぞれのメッシュを再セット
             Mesh left_HalfMesh = new Mesh();
             left_HalfMesh.name = "Split Mesh Left";
             left_HalfMesh.vertices  = left_side.vertices.ToArray();
@@ -188,7 +191,6 @@ namespace BLINDED_AM_ME
                 left_HalfMesh.SetIndices(left_side.subIndices[i].ToArray(), MeshTopology.Triangles, i); 
             }
 
-            //ここまででカットにより新しくできた右側のメッシュを配列化して再セット
             Mesh right_HalfMesh = new Mesh();
             right_HalfMesh.name = "Split Mesh Right";
             right_HalfMesh.vertices  = right_side.vertices.ToArray();
@@ -200,59 +202,40 @@ namespace BLINDED_AM_ME
             {
                 right_HalfMesh.SetIndices(right_side.subIndices[i].ToArray(), MeshTopology.Triangles, i);
             }
-            //分割用のクローン作製
+
+            //カット後の左右2つのオブジェクトを新規で生成する
+            //左側
             var cloneleft = Object.Instantiate(victim) as GameObject;
-            var cloneright = Object.Instantiate(victim) as GameObject;
-
-            //Destroy(clone.GetComponent<CapsuleCollider>());
-
-            //左側のメッシュを元のオブジェクトに割り当てる
-            //Destroy(victim.GetComponent<CapsuleCollider>());
             cloneleft.name = "left side";
-            cloneleft.transform.position = new Vector3(cloneleft.transform.position.x, cloneleft.transform.position.y, cloneleft.transform.position.z + globalPosisionZ);
+            cloneleft.transform.position = new Vector3(cloneleft.transform.position.x, cloneleft.transform.position.y, cloneleft.transform.position.z + globalPosisionZ);  //親オブジェクトが変わるので、その分Z方向の位置を調整
             cloneleft.GetComponent<MeshFilter>().mesh = left_HalfMesh;
-            GameObject leftSideObj = cloneleft;
+            AfterCutSetting(cloneleft, cuttedMaterial, true);
 
-            //某サイトでは下記処理を書いていたが、今回は必要なさそう
-            //rightSideObj.transform.parent = clone.transform.parent;
-            //rightSideObj.transform.localPosition = clone.transform.localPosition;
-            //rightSideObj.transform.localScale = clone.transform.localScale;
+            //右側
+            var cloneright = Object.Instantiate(victim) as GameObject;
             cloneright.name = "right side";
             cloneright.transform.position = new Vector3(cloneright.transform.position.x, cloneright.transform.position.y, cloneright.transform.position.z + globalPosisionZ);
             cloneright.GetComponent<MeshFilter>().mesh = right_HalfMesh;
-            GameObject rightSideObj = cloneright;
+            AfterCutSetting(cloneright, cuttedMaterial, true);
 
-            //右側の分は新しくGameObjectを作る
-            /*GameObject rightSideObj = new GameObject("right side", typeof(MeshFilter), typeof(MeshRenderer));
-            rightSideObj.transform.position = victim.transform.position;
-            rightSideObj.transform.rotation = victim.transform.rotation;
-            rightSideObj.GetComponent<MeshFilter>().mesh = right_HalfMesh;
-            */
-            //それぞれマテリアルを設定
-            leftSideObj.GetComponent<MeshRenderer>().materials = mats;
-            rightSideObj.GetComponent<MeshRenderer>().materials = mats;
-
-            //colliderを再設定
-            Destroy(leftSideObj.GetComponent<CapsuleCollider>());
-            leftSideObj.AddComponent<CapsuleCollider>().isTrigger = false;
-            AfterCutAction(leftSideObj, cuttedMaterial, true);
-            Destroy(rightSideObj.GetComponent<CapsuleCollider>());
-            rightSideObj.AddComponent<CapsuleCollider>().isTrigger = false;
-            AfterCutAction(rightSideObj, cuttedMaterial, true);
-            //最後にGameObjectの配列として戻す
-            return new GameObject[]{leftSideObj, rightSideObj };
+            return new GameObject[]{cloneleft, cloneright };
         }
 
-        static void AfterCutAction(GameObject cuttedObj, Material cuttedMaterial, bool rotateFlag)
+        //カット処理後のポールの性質をセット
+        static void AfterCutSetting(GameObject cuttedObj, Material cuttedMaterial, bool rotateFlag)
         {
-            Destroy(cuttedObj.transform.GetChild(0).gameObject);
+            Destroy(cuttedObj.GetComponent<CapsuleCollider>()); //colliderのサイズを新規のオブジェクトに合わせるためにDestroy->再セット
+            cuttedObj.AddComponent<CapsuleCollider>().isTrigger = false;  //カット後のオブジェクトは再度カットできないようにするためにトリガーはfalse
+            Destroy(cuttedObj.transform.GetChild(0).gameObject); //カット前に子オブジェクトとして含んでいるポイントライトを消去する
             cuttedObj.GetComponent<MeshRenderer>().material = cuttedMaterial;
-            cuttedObj.GetComponent<Rigidbody>().useGravity = true;
+            cuttedObj.GetComponent<Rigidbody>().useGravity = true; //カット後は重力落下させたいのでtrueに
             cuttedObj.tag = "Disactive";
         }
-
+        
+        //頂点を左右に振り分け、各辺とカット面の接点を新頂点としてセットする
         static void Cut_this_Face(int submesh, bool[] sides, int index1, int index2, int index3)
         {
+            //左右それぞれの情報を保持するための配列
             Vector3[] leftPoints = new Vector3[2];
             Vector3[] leftNormals = new Vector3[2];
             Vector2[] leftUvs = new Vector2[2];
@@ -263,6 +246,7 @@ namespace BLINDED_AM_ME
             bool didset_left = false;
             bool didset_right = false;
 
+            //三角形の3頂点を左右に振り分ける
             int p = index1;
             for (int side = 0; side < 3; side++)
             {
@@ -281,10 +265,12 @@ namespace BLINDED_AM_ME
 
                 if (sides[side])
                 {
+                    //左側
+                    //3頂点が左右に振り分けられるため、左右いずれかは2つの頂点を持つはず
                     if (!didset_left)
                     {
                         didset_left = true;
-
+                        //1頂点しかなかった場合にleftPoints[0, 1]の値を使って分割点を求めるため、ここで同じ値をセットしている
                         leftPoints[0]  = victim_mesh.vertices[p];
                         leftPoints[1]  = leftPoints[0];
 
@@ -296,6 +282,7 @@ namespace BLINDED_AM_ME
                     }
                     else
                     {
+                        //2頂点目の場合はleftPoints[1]に直接値を入れる
                         leftPoints[1]  = victim_mesh.vertices[p];
                         leftUvs[1]     = victim_mesh.uv[p];
                         leftNormals[1] = victim_mesh.normals[p];
@@ -303,6 +290,7 @@ namespace BLINDED_AM_ME
                 }
                 else
                 {
+                    //右側
                     if (!didset_right)
                     {
                         didset_right = true;
@@ -327,25 +315,22 @@ namespace BLINDED_AM_ME
 
             float distance = 0f;
 
-            blade.Raycast(new Ray(leftPoints[0], (rightPoints[0] - leftPoints[0]).normalized), out distance);
-
-            normalizedDistance = distance / (rightPoints[0] - leftPoints[0]).magnitude;
-
+            blade.Raycast(new Ray(leftPoints[0], (rightPoints[0] - leftPoints[0]).normalized), out distance); //左->右へレイを飛ばして交差点を見つける
+            normalizedDistance = distance / (rightPoints[0] - leftPoints[0]).magnitude; //見つかった交差点を頂点間の距離で割って左右の分割割合を計算する
+            //カット後の新頂点を求めて追加する
             Vector3 newVertex1 = Vector3.Lerp(leftPoints[0], rightPoints[0], normalizedDistance);
             Vector2 newUv1     = Vector2.Lerp(leftUvs[0], rightUvs[0], normalizedDistance);
             Vector3 newNormal1 = Vector3.Lerp(leftNormals[0] , rightNormals[0], normalizedDistance);
-
             new_vertices.Add(newVertex1);
 
             blade.Raycast(new Ray(leftPoints[1], (rightPoints[1] - leftPoints[1]).normalized), out distance);
-
             normalizedDistance = distance / (rightPoints[1] - leftPoints[1]).magnitude;
             Vector3 newVertex2 = Vector3.Lerp(leftPoints[1], rightPoints[1], normalizedDistance);
             Vector2 newUv2     = Vector2.Lerp(leftUvs[1], rightUvs[1], normalizedDistance);
             Vector3 newNormal2 = Vector3.Lerp(leftNormals[1] , rightNormals[1], normalizedDistance);
-
             new_vertices.Add(newVertex2);
 
+            //カットにより追加された新頂点から、新しいトライアングルを追加する
             left_side.AddTriangle(
                 new Vector3[]{leftPoints[0], newVertex1, newVertex2},
                 new Vector3[]{leftNormals[0], newNormal1, newNormal2 },
@@ -382,22 +367,29 @@ namespace BLINDED_AM_ME
         private static List<Vector3> capVertTracker = new List<Vector3>();
         private static List<Vector3> capVertpolygon = new List<Vector3>();
 
+        //実際のカットにあたる処理
         static void Capping()
         {
+            //カット面の重複頂点を排除するために新頂点を全て調査する
+            //調査済みの頂点を格納するためのリスト
             capVertTracker.Clear();
-
+            //新頂点分だけループ
             for (int i = 0; i < new_vertices.Count; i++)
             {
+                //調査済みの場合はスキップ
                 if (capVertTracker.Contains(new_vertices[i]))
                 {
                     continue;
                 }
 
+                //重複頂点を排除した頂点リストを初期化
                 capVertpolygon.Clear();
 
+                //調査頂点と次の頂点をポリゴン配列に保持
                 capVertpolygon.Add(new_vertices[i + 0]);
                 capVertpolygon.Add(new_vertices[i + 1]);
 
+                //調査済み頂点として追加
                 capVertTracker.Add(new_vertices[i + 0]);
                 capVertTracker.Add(new_vertices[i + 1]);
 
@@ -406,6 +398,8 @@ namespace BLINDED_AM_ME
                 {
                     isDone = true;
 
+                    //2頂点ごとに調査をする
+                    //1トライアングルからは必ず2頂点が生成されており、1つの頂点に対してほぼ同じ位置に存在する新頂点が存在するため
                     for (int k = 0; k < new_vertices.Count; k += 2)
                     { 
                         if (new_vertices[k] == capVertpolygon[capVertpolygon.Count - 1] && !capVertTracker.Contains(new_vertices[k + 1]))
@@ -423,28 +417,28 @@ namespace BLINDED_AM_ME
                     }
                 }
 
-                FillCap(capVertpolygon);
+                FillCap(capVertpolygon); //精査済みの頂点群を元にポリゴンを形成する
             }
         }
 
+        //カット面を埋める
         static void FillCap(List<Vector3> vertices)
         {
-            Vector3 center = Vector3.zero;
-
+            Vector3 center = Vector3.zero; //カット面の中心点をいれる変数
+            //新頂点の位置を全て合計
             foreach(Vector3 point in vertices)
             {
                 center += point;
             }
-
+            //合計値を頂点数で割って中心点を計算する
             center = center / vertices.Count;
-
+            //カット面の左側を上方向にする
             Vector3 upward = Vector3.zero;
-
             upward.x =  blade.normal.y;
             upward.y = -blade.normal.x;
             upward.z =  blade.normal.z;
 
-            Vector3 left = Vector3.Cross(blade.normal, upward);
+            Vector3 left = Vector3.Cross(blade.normal, upward); //法線と上方向から横軸を算出
 
             Vector3 displacement = Vector3.zero;
             Vector3 newUV1 = Vector3.zero;
@@ -452,20 +446,20 @@ namespace BLINDED_AM_ME
 
             for (int i = 0; i < vertices.Count; i++)
             {
-                displacement = vertices[i] - center;
-
+                displacement = vertices[i] - center; //中心点から各頂点へのベクトル
+                //UVの位置を決める
                 newUV1 = Vector3.zero;
                 newUV1.x = 0.5f + Vector3.Dot(displacement, left);
                 newUV1.y = 0.5f + Vector3.Dot(displacement, upward);
                 newUV1.z = 0.5f + Vector3.Dot(displacement, blade.normal);
 
                 displacement = vertices[(i + 1) % vertices.Count] - center;
-
                 newUV2 = Vector3.zero;
                 newUV2.x = 0.5f + Vector3.Dot(displacement, left);
                 newUV2.y = 0.5f + Vector3.Dot(displacement, upward);
                 newUV2.z = 0.5f + Vector3.Dot(displacement, blade.normal);
 
+                //左側のポリゴンとして、トライアングルを追加
                 left_side.AddTriangle(
                     new Vector3[]{
                         vertices[i],
@@ -485,7 +479,7 @@ namespace BLINDED_AM_ME
                     -blade.normal,
                     left_side.subIndices.Count - 1 
                 );
-
+                //右側
                 right_side.AddTriangle(
                     new Vector3[]{
                         vertices[i],
