@@ -48,7 +48,9 @@ public class DiskGenerator : MonoBehaviour
                     tapReleasePosition = Input.mousePosition;
                     diskGeneratePosition = GameObject.Find("Main Camera").transform.position; //カメラの座標をディスク生成位置とする
                     GameObject disk = Instantiate(diskPrefab, diskGeneratePosition, Quaternion.identity) as GameObject;
-                    disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(tapStartPosition, tapReleasePosition);
+                    disk.GetComponent<Disk>().direction = ReleaseDirection(tapStartPosition, tapReleasePosition); //生成したディスクの射出角度をセットする
+                    
+                    //ディスク減少を止めるアイテムを使用していない場合のみ、ディスク生成後にディスクの数を減少させる
                     if(!GameController.infinitytUsing)
                     {
                         GameController.diskCount -= 1;
@@ -65,51 +67,53 @@ public class DiskGenerator : MonoBehaviour
     {
         diskGenerateFlag = false;
     }
-}
 
-public static class Orbit
-{
-    static float maxWidth = 500.0f;
-    static float maxHeight = 500.0f;
-    static float maxRotX = 60.0f;
-    static float maxRotY = 45.0f;
-    static float x = 0.0f;
-    static float y = 0.0f;
+    [SerializeField] float maxWidth = 500.0f; //フリックのx方向の幅の最大値
+    [SerializeField] float maxHeight = 500.0f; //フリックのy方向の幅の最大値
+    [SerializeField] float maxAngleX = 60.0f; //ディスク射出時のx方向の角度の最大値
+    [SerializeField] float maxAngleY = 45.0f; //ディスク生成時のy方向の角度の最大値
 
-    //マウスの移動量から射出方向の回転角度へ変換
-    public static (float, float) ReleaseDirection(Vector2 start, Vector2 end)
+    //フリック時の(x, y)の方向と距離からディスクの射出角度を計算する
+    public (float, float) ReleaseDirection(Vector2 start, Vector2 end)
     {
-        float move_x = 0.0f;
-        float move_y = 0.0f;
+        float x = 0.0f;
+        float y = 0.0f;
+        float moveX = 0.0f;
+        float moveY = 0.0f;
         Vector2 move = end -start;
         if (Mathf.Abs(move.x) <= maxWidth)
         {
-            move_x = (float)move.x;    
+            //x方向のフリック距離がフリック幅最大値より小さければ、x方向のフリック距離としてセット
+            moveX = (float)move.x;    
         }
         else if(move.x <= 0)
         {
-            move_x = -maxWidth;
+            //x方向のフリック距離がフリック幅最大値より大きく、xの負の方向へフリックされていた場合
+            moveX = -maxWidth;
         }
         else
         {
-            move_x = maxWidth;
+            //x方向のフリック距離がフリック幅最大値より大きく、xの正の方向へフリックされていた場合
+            moveX = maxWidth;
         }
 
+        //x方向同様に、y方向のフリック距離/方向によってx方向のフリック距離をセット
         if (Mathf.Abs(move.y) <= maxHeight)
         {
-            move_y = (float)move.y;    
+            moveY = (float)move.y;    
         }
         else if(move.y <= 0)
         {
-            move_y = -maxHeight;
+            moveY = -maxHeight;
         }
         else
         {
-            move_y = maxHeight;
+            moveY = maxHeight;
         }
 
-         x = maxRotX * move_x / maxWidth;
-         y = maxRotY * move_y / maxHeight;
+        //フリック距離の比に応じてディスクの射出角度を計算する
+         x = maxAngleX * moveX / maxWidth;
+         y = maxAngleY * moveY / maxHeight;
 
         return (x, y);
     }
