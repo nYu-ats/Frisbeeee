@@ -111,7 +111,7 @@ public class GameController : MonoBehaviour
         //CalcScore();
         StageProgress();
         ColorBarUpdate();
-        ItemGet();
+        CheckItemGet();
         ItemConsume();
         if(displayGuide)
         {
@@ -187,7 +187,42 @@ public class GameController : MonoBehaviour
         colorMark.GetComponent<RectTransform>().localPosition = new Vector2(colorMarkPosition * colorMarkChangeRate, 0);
     }
 
-    void ItemGet()
+    public static void GetItem(string item)
+    {
+        if(item == "Straight")
+        {
+            straightItem = true;
+        }
+        else if(item == "Infinity")
+        {
+            diskInfinityItem = true;
+        }
+        else if(item == "ColorStop")
+        {
+            colorStopItem = true;
+        }
+    }
+
+    public static bool ReturnItemStatus(string item)
+    {
+        if(item == "Straight")
+        {
+            return straightItem;
+        }
+        else if(item == "Infinity")
+        {
+            return diskInfinityItem;
+        }
+        else if(item == "ColorStop")
+        {
+            return colorStopItem;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    void CheckItemGet()
     {
         if(straightItem)
         {
@@ -259,6 +294,7 @@ public class GameController : MonoBehaviour
     {
         if(straightItem)
         {
+            DiskGenerator.TappCancel();
             straightItem = false;
             straightItemImage.enabled = false;
             //straightItemImage.color = new Color(straightItemImage.color.r, straightItemImage.color.g, straightItemImage.color.b, 50);
@@ -269,6 +305,7 @@ public class GameController : MonoBehaviour
 
     public void InfinityItemUse()
     {
+        DiskGenerator.TappCancel();
         diskInfinityItem = false;
         diskInfinityItemImage.enabled = false;
         infinityUsingImage1.enabled = true;
@@ -279,6 +316,7 @@ public class GameController : MonoBehaviour
 
     public void ColorStopItemUse()
     {
+        DiskGenerator.TappCancel();
         colorStopItem = false;
         colorStopItemImage.enabled = false;
         colorStopImage1.enabled = true;
@@ -290,6 +328,7 @@ public class GameController : MonoBehaviour
     public void PauseGame()
     {
         gamePause = true;
+        DiskGenerator.TappCancel();
         foreach(Button obj in menuButton)
         {
             obj.enabled = true;

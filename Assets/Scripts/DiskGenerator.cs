@@ -4,80 +4,66 @@ using UnityEngine;
 
 public class DiskGenerator : MonoBehaviour
 {
-    static Vector2 pos_start;
-    static Vector2 pos_tmp;
-    static Vector2 pos_end;
-    public GameObject diskPrefab;
-    private Vector3 releasePosition;
-    private float mouseDownTime = 0.0f;
-    [SerializeField] float mouseDownDuaration;
+    static Vector2 tapStartPosition;
+    static Vector2 tapTempPosition;
+    static Vector2 tapReleasePosition;
+    [SerializeField] GameObject diskPrefab;
+    private Vector3 diskGeneratePosition;
     [SerializeField] GameObject uiCanvas;
     [SerializeField] GameObject diskDecreasePopUp;
+    public static bool diskGenerateFlag;//アイテム消費やゲームポーズボタンを押したときにディスクの生成をしないようにするためのフラグ 
 
-
-    // Start is called before the first frame update
     void Start()
     {
+        diskGenerateFlag = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!GameController.gamePause)
+        //ディスク残団が0の場合はゲームオーバーなのでディスクは生成しない
+        if(GameController.ReturnDiskStatus())
         {
-            if(GameController.diskCount > 0)
+            //ゲームポーズ中はディスクを生成しない
+            if(!GameController.ReturnPauseStatus())
             {
                 if(Input.GetMouseButtonDown(0))
                 {
-                    pos_start = Input.mousePosition;
+                    tapStartPosition = Input.mousePosition; //画面がタップされた位置をディスクの射出方向を決める起点とする
+                    //画面がタップされた時にディスクが生成できる状態にする
+                    //ディスク生成フラグのtrue/falseの切替タイミングの制御がしやすいため、ここでtrueをセットするようにする
+                    diskGenerateFlag = true; 
                 }
+
                 if(Input.GetMouseButton(0))
                 {
-                    mouseDownTime += Time.deltaTime;
-                    pos_tmp = Input.mousePosition;
+                    //画面フリックの長さと方向を求めるため、
+                    //画面がタップ後に指が離された座標を更新する
+                    tapTempPosition = Input.mousePosition; 
                 }
-                if(Input.GetMouseButtonUp(0))
+
+                //ディスク生成可能状態の時のみ処理を行う
+                if(Input.GetMouseButtonUp(0) & diskGenerateFlag)
                 {
-                    //マウスが離されたら射出方向を設定してディスク生成
-                    if(mouseDownTime > mouseDownDuaration)
+                    tapReleasePosition = Input.mousePosition;
+                    diskGeneratePosition = GameObject.Find("Main Camera").transform.position; //カメラの座標をディスク生成位置とする
+                    GameObject disk = Instantiate(diskPrefab, diskGeneratePosition, Quaternion.identity) as GameObject;
+                    disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(tapStartPosition, tapReleasePosition);
+                    if(!GameController.infinitytUsing)
                     {
-                        pos_end = Input.mousePosition;
-                        releasePosition = GameObject.Find("Main Camera").transform.position;
-                        //GameObject disk = Instantiate(diskPrefab, new Vector3(releasePosition.x, releasePosition.y + 0.5f, releasePosition.z), Quaternion.identity) as GameObject;
-                        GameObject disk = Instantiate(diskPrefab, releasePosition, Quaternion.identity) as GameObject;
-                        disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
-                        if(!GameController.infinitytUsing)
-                        {
-                            GameController.diskCount -= 1;
-                            GameObject popUp = Instantiate(diskDecreasePopUp);
-                            popUp.transform.SetParent(uiCanvas.transform, false);
-                        }
+                        GameController.diskCount -= 1;
+                        GameObject popUp = Instantiate(diskDecreasePopUp);
+                        popUp.transform.SetParent(uiCanvas.transform, false);
                     }
-                    mouseDownTime = 0.0f;
                 }
             }
         }
-        /*
-        //マウス入力取得
-        if(Input.GetMouseButtonDown(0))
-        {
-            pos_start = Input.mousePosition;
-        }
-        if(Input.GetMouseButton(0))
-        {
-            pos_tmp = Input.mousePosition;
-            
-        }
-        if(Input.GetMouseButtonUp(0))
-        {
-            //マウスが離されたら射出方向を設定してディスク生成
-            pos_end = Input.mousePosition;
-            releasePosition = GameObject.Find("Main Camera").transform.position;
-            //GameObject disk = Instantiate(diskPrefab, new Vector3(releasePosition.x, releasePosition.y + 0.5f, releasePosition.z), Quaternion.identity) as GameObject;
-            GameObject disk = Instantiate(diskPrefab, releasePosition, Quaternion.identity) as GameObject;
-            disk.GetComponent<Disk>().direction = Orbit.ReleaseDirection(pos_start, pos_end);
-        }
-        */
+    }
+
+    //アイテム消費やゲームポーズボタンを押したときにディスク生成フラグをfalseにセットできるようにする
+    public static void TappCancel()
+    {
+        diskGenerateFlag = false;
     }
 }
 
@@ -125,7 +111,6 @@ public static class Orbit
          x = maxRotX * move_x / maxWidth;
          y = maxRotY * move_y / maxHeight;
 
-        //Debug.Log((x,y));
         return (x, y);
     }
 }
