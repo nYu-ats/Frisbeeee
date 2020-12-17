@@ -5,73 +5,61 @@ using UnityEngine.UI;
 public class PlayerCollision : MonoBehaviour
 {
     [SerializeField] GameObject collisionSound;
-    [SerializeField] int lifeDecrasePoll;
-    [SerializeField] int lifeDecraseWall;
-    [SerializeField] Image collisionEffect1;
-    [SerializeField] GameObject collisionEffect2;
-    [SerializeField] GameObject playerCamera;
-    [SerializeField] float displayTime = 1.0f;
-    [SerializeField] GameObject diskDecreasePopUp;
+    [SerializeField] int lifeDecrasePoll; //ポールに衝突した時のディスクの減少量
+    [SerializeField] int lifeDecraseWall; //壁に衝突した時のディスクの減少量
+    [SerializeField] Image collisionEffect;
+    [SerializeField] float effectPlayTime = 0.5f;
+    [SerializeField] GameObject pollHitPopUp; //ポールへの衝突によるディスクの減少量のポップアップ
+    [SerializeField] GameObject wallHitPopUp; //壁への衝突によるディスクの減少量のポップアップ
     [SerializeField] GameObject uiCanvas;
-
-
-
-    private bool collisionPlayFlag = false;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
+    //衝突時の処理を1だけしかを行輪内容にするためOnTriggerExitを使う
     void OnTriggerExit(Collider collision)
     {
+        //タグで衝突対象を判断
         if(collision.gameObject.tag == "RedPoll" | collision.gameObject.tag == "BluePoll" | collision.gameObject.tag == "WhitePoll")
         {
-            GameController.diskCount -= lifeDecrasePoll;
-            DisplayDecreasePopUp();
+            GameController.diskCount -= lifeDecrasePoll; //規定個数ディスクを減らす
+            PlayCollisionEffect(); //衝突時の効果を再生
+            DisplayDecreasePopUp(pollHitPopUp, lifeDecrasePoll); //ポップアップを出す
         }
         else if(collision.gameObject.tag == "Disk")
         {
-
+            //ディスクを発射した際にコライダーに衝突してしまうことがあるので
+            //衝突対象がディスクだった場合は処理を無視する
         }
         else
         {
+            //ポールとディスク以外で衝突しうるオブジェクトは壁のみ
             GameController.diskCount -= lifeDecraseWall;
-            DisplayDecreasePopUp();
+            PlayCollisionEffect();
+            DisplayDecreasePopUp(wallHitPopUp, lifeDecraseWall);
         }
     }
 
-    private void DisplayDecreasePopUp()
+    //ポップアップの表示
+    private void DisplayDecreasePopUp(GameObject hit, int decreaseNumber)
     {
-        GameObject popUp = Instantiate(diskDecreasePopUp);
+        GameObject popUp = Instantiate(hit);
+        popUp.transform.Find("Text").GetComponent<Text>().text = "-" + decreaseNumber.ToString(); //Canvasに表示する前に衝突対象に応じた値をポップアップにセットする
         popUp.transform.SetParent(uiCanvas.transform, false);
     }
 
-    void OnTriggerEnter(Collider collision)
+    //障害物に衝突した時の効果を再生する
+    private void PlayCollisionEffect()
     {
-        if(!collisionPlayFlag & (collision.gameObject.tag != "Disk"))
-        {
-            collisionPlayFlag = true;
-            collisionEffect1.enabled = true;
-            playerCamera.GetComponent<Animator>().SetBool("PlayerCollision", true);
-            collisionEffect2.GetComponent<Animator>().SetBool("PlayerCollision", true);
-            Instantiate(collisionSound, this.transform.position, Quaternion.Euler(0, 0, 0));
-            StartCoroutine(CollisionEffectDisactivate(collisionEffect1, collisionEffect2, playerCamera, displayTime));
-        }
+        this.transform.parent.GetComponent<Animator>().SetBool("PlayerCollision", true); //カメラの子オブジェクトにプレイヤーとしてのコライダーをセットしている
+        collisionEffect.enabled = true;
+        Instantiate(collisionSound, this.transform.position, Quaternion.Euler(0, 0, 0));
+        StartCoroutine(CollisionEffectDisactivate(collisionEffect, this.transform.parent.gameObject, effectPlayTime));  
     }
 
-    IEnumerator CollisionEffectDisactivate(Image img1, GameObject img2, GameObject cameraObj, float delay)
+    //規定時間経過で衝突効果をfalseに再セット
+    IEnumerator CollisionEffectDisactivate(Image img1, GameObject cameraObj, float delay)
     {
         yield return new WaitForSeconds(delay);
         img1.enabled = false;
-        img2.GetComponent<Animator>().SetBool("PlayerCollision", false);
         cameraObj.GetComponent<Animator>().SetBool("PlayerCollision", false);
-        collisionPlayFlag = false;
     }
     
 }

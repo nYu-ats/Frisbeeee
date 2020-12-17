@@ -3,36 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+/*
+プレイヤーが射出するディスクの挙動
+*/
 public class Disk : MonoBehaviour
 {
-    public (float x, float y) direction;
-    public float addForce;
-    public float decreaseForceX;
-    public float decreaseForceY;
-    public float ToruqueX;
-    static float addForceX;
-    static float addForceY;
-    static float addForceZ;
+    [SerializeField] float addForce; //前方へ加える力
+    [SerializeField] float decreaseForceX; //x方向のカーブさせる力
+    [SerializeField] float decreaseForceY; //Y方向のカーブさせる力
+    [SerializeField] float ToruqueX; //徐々にディスクを傾けるための角度
+    public (float x, float y) direction; //ディスクを射出する角度
+    private float addForceX;
+    private float addForceY;
+    private float addForceZ;
     private float cameraSpeed;
-    static AudioSource audioPlayer;
-    public AudioClip audioClipBall;
-    public AudioClip audioClipPoll;
-    public AudioClip audioDestroySelf;
-
-    public GameObject effectParticlePoll;
-    public GameObject effectParticleBallRed;
-    public GameObject effectParticleBallBlue;
-    public GameObject effectParticleBallWhite;
-    public GameObject effectDiskCrush;
-    public Vector3 effectRotation;
-    public GameObject effectCollisionFlash;
-    static Vector3 collisionPosition;
-    [SerializeField] int diskIncreaseNumberBall;
-    [SerializeField] int diskIncreaseNumberPoll;
-    [SerializeField] int colorIncreaseNumberBall;
-    [SerializeField] int colorIncreaseNumberPoll;
-    [SerializeField] GameObject pollHitSound;
-    [SerializeField] GameObject wallHitSound;
 
 
     void Start()
@@ -42,15 +26,29 @@ public class Disk : MonoBehaviour
         addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
         addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));
         addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
-        addForceZ += cameraSpeed;
-        DirFrisbee(direction.x, direction.y);
-        RotateFrisbee(direction.x);
-        BehaviourFrisbee(new Vector3(addForceX, addForceY, addForceZ));
-        audioPlayer = this.gameObject.GetComponent<AudioSource>();
+        addForceZ += cameraSpeed * this.gameObject.GetComponent<Rigidbody>().mass; //カメラの移動速度からZ方向に追加で力を加える
+        
+        //フリスビーっぽい挙動のための処理
+        //フリスビー射出方向に応じて傾けて、Z軸方向に徐々に回転させる
+        if(direction.x >= 0)
+        {
+            transform.rotation = Quaternion.Euler(0, 0, direction.y);
+            this.GetComponent<Rigidbody>().AddTorque(0, 0, ToruqueX, ForceMode.Acceleration);
+        }
+        else
+        {
+            transform.rotation = Quaternion.Euler(0, 0, -direction.y);
+            this.GetComponent<Rigidbody>().AddTorque(0, 0, -ToruqueX, ForceMode.Acceleration);
+        }
+
+        //フリスビーを射出する
+        this.GetComponent<Rigidbody>().AddForce(new Vector3(addForceX, addForceY, addForceZ));
     }
 
     void Update()
     {
+        //ディスクを直進させるアイテムを使っている時は起動の調整はしない
+        //アイテム未使用状態の時は一定後からでカーブさせる
         if(GameController.straightUsing)
         {
             return;
@@ -59,131 +57,58 @@ public class Disk : MonoBehaviour
         {
             if(direction.x >=0)
             {
-                BehaviourFrisbee(new Vector3(decreaseForceX, decreaseForceY, 0));
+                this.GetComponent<Rigidbody>().AddForce(new Vector3(decreaseForceX, decreaseForceY, 0));
             }
             else
             {
-                BehaviourFrisbee(new Vector3(-decreaseForceX, decreaseForceY, 0));
+                this.GetComponent<Rigidbody>().AddForce(new Vector3(-decreaseForceX, decreaseForceY, 0));
             }
         }
-        //xの向きに応じて加速度の向きを反転
-        /*if(direction.x >=0)
-        {
-            BehaviourFrisbee(new Vector3(decreaseForceX, decreaseForceY, 0));
-        }
-        else
-        {
-            BehaviourFrisbee(new Vector3(-decreaseForceX, decreaseForceY, 0));
-        }*/
     }
 
-    //フリスビーを回転させるメソッド
-    public void RotateFrisbee(float x)
-    {
-        if(x >= 0)
-        {
-            this.GetComponent<Rigidbody>().AddTorque(0, 0, ToruqueX, ForceMode.Acceleration);
-        }
-        else
-        {
-            this.GetComponent<Rigidbody>().AddTorque(0, 0, -ToruqueX, ForceMode.Acceleration);
-        }
-    }
-
-    //フリスビーに力を加えるメソッド
-    public void BehaviourFrisbee(Vector3 dir)
-    {
-        this.GetComponent<Rigidbody>().AddForce(dir);
-    }
-
-    //フリスビーを傾けるメソッド。
-    public void DirFrisbee(float x, float z)
-    {
-        if(x >= 0)
-        {
-            transform.rotation = Quaternion.Euler(0, 0, z);
-        }
-        else
-        {
-            transform.rotation = Quaternion.Euler(0, 0, -z);
-        }
-        
-    }
+    [SerializeField] GameObject pollCutParticle;
+    [SerializeField] GameObject diskCrushParticle;
+    [SerializeField] GameObject effectCollisionFlash;
+    [SerializeField] int diskIncreaseNumberPoll;
+    [SerializeField] int colorIncreaseNumberPoll;
+    [SerializeField] GameObject pollHitSound;
+    [SerializeField] GameObject wallHitSound;
+    private Vector3 collisionPosition;
 
     void OnTriggerEnter(Collider collision)
     {
+        //衝突が発生した位置で効果音とパーティクルを再生する
         collisionPosition = this.transform.position;
-        if(collision.gameObject.tag == "RedBall")
+        if(collision.gameObject.tag == "BluePoll")
         {
             if(!GameController.colorStopUsing)
             {
-                GameController.colorBarPosition += colorIncreaseNumberBall;
-                GameController.colorMarkPosition += colorIncreaseNumberBall;    
-            }
-            audioPlayer.PlayOneShot(audioClipBall);
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticleBallRed, collisionPosition, Quaternion.Euler(effectRotation));
-            Destroy(collision.gameObject);
-        }
-        else if(collision.gameObject.tag == "BlueBall")
-        {
-            if(!GameController.colorStopUsing)
-            {
-                GameController.colorBarPosition -= colorIncreaseNumberBall;
-                GameController.colorMarkPosition -= colorIncreaseNumberBall;
-            }
-            audioPlayer.PlayOneShot(audioClipBall);
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticleBallBlue, collisionPosition, Quaternion.Euler(effectRotation));
-            Destroy(collision.gameObject);
-        }
-        else if(collision.gameObject.tag == "WhiteBall")
-        {
-            GameController.diskCount += diskIncreaseNumberBall;
-            audioPlayer.PlayOneShot(audioClipBall);
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticleBallWhite, collisionPosition, Quaternion.Euler(effectRotation));
-            Destroy(collision.gameObject);
-        }
-        else if(collision.gameObject.tag == "BluePoll")
-        {
-            if(!GameController.colorStopUsing)
-            {
+                //青ポールをカットした時はゲージの青を増加
                 GameController.colorBarPosition -= colorIncreaseNumberPoll;
                 GameController.colorMarkPosition -= colorIncreaseNumberPoll;
             }
-            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
         else if(collision.gameObject.tag == "RedPoll")
         {
+            //赤ポールをカットした時はゲージの赤を増加
             if(!GameController.colorStopUsing)
             {
                 GameController.colorBarPosition += colorIncreaseNumberPoll;
                 GameController.colorMarkPosition += colorIncreaseNumberPoll;
             }
-            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
         else if(collision.gameObject.tag == "WhitePoll")
         {
+            //白ポールをカットした時はディスクを規定数回復
             GameController.diskCount += diskIncreaseNumberPoll;
-            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectParticlePoll, collisionPosition, Quaternion.Euler(effectRotation));
         }
-        /*else if(collision.transform.root.gameObject.tag == "Wall" & collision.gameObject.tag != "Switch1")
-        {
-            Instantiate(wallHitSound, collisionPosition, Quaternion.Euler(effectRotation));
-            Instantiate(effectDiskCrush, collisionPosition, Quaternion.Euler(effectRotation));
-            Destroy(this.gameObject);
-        }*/
+        //ポールヒット時のパーティクル、フラッシュ、効果音を再生
+        Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(0, 0, 0));
+        Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(0, 0, 0));
+        Instantiate(pollCutParticle, collisionPosition, Quaternion.Euler(0, 0, 0));
     }
 
-    
-    
+    //壁にはトリガーはつけていないので、壁に衝突した時の効果はOnCollisionEnterで再生する    
     void OnCollisionEnter(Collision collision)
     {
         if(collision.transform.root.gameObject.tag == "Wall")
@@ -191,10 +116,11 @@ public class Disk : MonoBehaviour
             collisionPosition = this.transform.position;
             if(collision.gameObject.tag != "Switch1")
             {
-                Instantiate(wallHitSound, collisionPosition, Quaternion.Euler(effectRotation));
+                //ディスクがスイッチに当たった時は専用の効果音を再生
+                Instantiate(wallHitSound, collisionPosition, Quaternion.Euler(0, 0, 0));
             }
-            Instantiate(effectDiskCrush, collisionPosition, Quaternion.Euler(effectRotation));
-            Destroy(this.gameObject);
+            Instantiate(diskCrushParticle, collisionPosition, Quaternion.Euler(0, 0, 0));
+            Destroy(this.gameObject); //壁衝突時にディスクを破壊する
         } 
     }    
 }

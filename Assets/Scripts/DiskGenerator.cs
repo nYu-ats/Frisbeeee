@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+画面へのインプットを読み込んで
+ディスクを生成するスクリプト
+*/
+
 public class DiskGenerator : MonoBehaviour
 {
-    static Vector2 tapStartPosition;
-    static Vector2 tapTempPosition;
-    static Vector2 tapReleasePosition;
+    private Vector2 tapStartPosition;
+    private Vector2 tapTempPosition;
+    private Vector2 tapReleasePosition;
     [SerializeField] GameObject diskPrefab;
     private Vector3 diskGeneratePosition;
     [SerializeField] GameObject uiCanvas;
     [SerializeField] GameObject diskDecreasePopUp;
+    [SerializeField] float adjustDiskGeneratePositionZ = 1.0f;
     public static bool diskGenerateFlag;//アイテム消費やゲームポーズボタンを押したときにディスクの生成をしないようにするためのフラグ 
 
     void Start()
@@ -46,7 +52,8 @@ public class DiskGenerator : MonoBehaviour
                 if(Input.GetMouseButtonUp(0) & diskGenerateFlag)
                 {
                     tapReleasePosition = Input.mousePosition;
-                    diskGeneratePosition = GameObject.Find("Main Camera").transform.position; //カメラの座標をディスク生成位置とする
+                    diskGeneratePosition = GameObject.Find("Main Camera").transform.position;
+                    diskGeneratePosition = new Vector3(diskGeneratePosition.x, diskGeneratePosition.y, diskGeneratePosition.z + adjustDiskGeneratePositionZ); //Player Colliderとの衝突を避けるためカメラの一定距離前方でディスクを生成
                     GameObject disk = Instantiate(diskPrefab, diskGeneratePosition, Quaternion.identity) as GameObject;
                     disk.GetComponent<Disk>().direction = ReleaseDirection(tapStartPosition, tapReleasePosition); //生成したディスクの射出角度をセットする
                     
