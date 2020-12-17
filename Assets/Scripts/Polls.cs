@@ -26,6 +26,7 @@ public class Polls : MonoBehaviour
     [SerializeField] GameObject diskIncreasePopUp;
     [SerializeField] GameObject blueIncreasePopUp;
     [SerializeField] GameObject redIncreasePopUp;
+    [SerializeField] float lifeTime = 5.0f; //カット後のポールの存在時間
     //ポップアップの親となるCanvas
     private GameObject uiCanvas;
 
@@ -43,11 +44,13 @@ public class Polls : MonoBehaviour
         */
         if(victim.name == "right side")
         {
-           victim.GetComponent<Rigidbody>().AddTorque(-10, 0, 0, ForceMode.Impulse); 
+           victim.GetComponent<Rigidbody>().AddTorque(-10, 0, 0, ForceMode.Impulse);
+           StartCoroutine(DestroyCuttedPoll(this.gameObject, lifeTime));
         }
         else if(victim.name == "left side")
         {
-           victim.GetComponent<Rigidbody>().AddTorque(10, 0, 0, ForceMode.Impulse); 
+           victim.GetComponent<Rigidbody>().AddTorque(10, 0, 0, ForceMode.Impulse);
+           StartCoroutine(DestroyCuttedPoll(this.gameObject, lifeTime));
         }
     }
 
@@ -89,5 +92,10 @@ public class Polls : MonoBehaviour
         popUp.transform.SetParent(uiCanvas.transform, false);
     }
 
+    IEnumerator DestroyCuttedPoll(GameObject cuttedPoll, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(cuttedPoll);
+    }
 
 }
