@@ -27,167 +27,72 @@ public class MenuController : MonoBehaviour
         }
     }
 
-
     /*
     各ボタンクリック時の処理
     - スタートボタン
     - オプションボタン
     - リターンボタン
     - ステージセレクトボタン
-    - オプションセレクトボタン
+    - オプション設定ボタン
     */
 
-
-    //スタートボタン
-    [SerializeField] Button[] stageButton;
-    [SerializeField] Image[] stageImage;
-    [SerializeField] Text[] stageText;
-    //現状の全ステージ数は3つ
-    private const int stageCount = 3;
+    /*
+    スタートボタン
+    */
+    private const int stageCount = 3;     //ステージ数は3つ
+    public StageChoisePanel stageChoisePanel;
 
     //スタートボタンクリック時の処理
     public void OnStartButtonClicked()
     {
         //ステージセレクト画面を表示する
-        foreach(Button obj in stageButton)
+        stageChoisePanel.SwitchStageChoisePanelDisplay(true);
+        //未到達ステージがある場合は、選択できないようにする
+        if(PlayerPrefs.GetInt("Stage") != stageCount)
         {
-            obj.enabled = true;
-        }
-        
-        foreach(Image obj in stageImage)
-        {
-            obj.enabled = true;
-        }
-
-        foreach(Text obj in stageText)
-        {
-            obj.enabled = true;
-        }
-
-        //未到達ステージについては、選択できないようにする
-        for(int i = PlayerPrefs.GetInt("Stage"); i < stageCount; i++)
-        {
-            stageImage[i].color = new Color(255.0f, 255.0f, 255.0f, 0.1f);
-            stageText[i].color = new Color(255.0f, 255.0f, 255.0f, 0.1f);
-            stageButton[i].enabled = false;
+            stageChoisePanel.DisactivateUnreachStage(PlayerPrefs.GetInt("Stage"), stageCount);
         }
     }
 
 
-    //オプションボタン
-    [SerializeField] Button[] volumeButton;
-    [SerializeField] Image[] volumeImage;
-    [SerializeField] Text[] volumeText;
-    [SerializeField] Button[] guideButton;
-    [SerializeField] Image[] guideImage;
-    [SerializeField] Text[] guideText;
-
-    //オプションの設定値を示すためのイメージ
-    [SerializeField] Image[] volumeChecked;
-    [SerializeField] Image[] guideChecked;
+    /*
+    オプションボタン
+    */
+    public OptionSettingPanel optionSettingPanel;
 
     //オプションボタンクリック時の処理
     public void OnOptionBuutnClicked()
     {
-        foreach(Button obj in volumeButton)
-        {
-            obj.enabled = true;
-        }
-        
-        foreach(Image obj in volumeImage)
-        {
-            obj.enabled = true;
-        }
-
-        foreach(Text obj in volumeText)
-        {
-            obj.enabled = true;
-        }
-
-        foreach(Button obj in guideButton)
-        {
-            obj.enabled = true;
-        }
-        
-        foreach(Image obj in guideImage)
-        {
-            obj.enabled = true;
-        }
-
-        foreach(Text obj in guideText)
-        {
-            obj.enabled = true;
-        }
+        optionSettingPanel.SwitchOptionSelectPanelDisplay(true);
         //オプション設定値を示すイメージを表示する
-        volumeChecked[PlayerPrefs.GetInt("Volume")].enabled = true;
-        guideChecked[PlayerPrefs.GetInt("Guide")].enabled = true;
+        optionSettingPanel.DisplaySelectedOptionValue(PlayerPrefs.GetInt("Volume"), PlayerPrefs.GetInt("Guide"), true);
     }
 
 
-    //リターンボタン
-    //リターンボタンクリック時の処理
-    //どの画面から押されたかによって非表示化する対象を分岐させる
+    /*
+    リターンボタン
+    リターンボタンクリック時の処理
+    どのパネルから押されたかによって非表示化する対象を分岐させる
+    */
     public void OnReturnButtonClicked(int flag)
     {
-        //ステージセレクト画面から押された場合 : flag -> 1
+        //ステージチョイス画面から押された場合 : flag -> 1
         //オプション設定画面から押された場合 : flag -> 2
         if(flag == 1)
         {
-            foreach(Button obj in stageButton)
-            {
-                obj.enabled = false;
-            }
-        
-            foreach(Image obj in stageImage)
-            {
-                obj.enabled = false;
-            }
-
-            foreach(Text obj in stageText)
-            {
-                obj.enabled = false;
-            }    
+            stageChoisePanel.SwitchStageChoisePanelDisplay(false);
         }
         else if(flag == 2)
         {
-            foreach(Button obj in volumeButton)
-            {
-                obj.enabled = false;
-            }
-        
-            foreach(Image obj in volumeImage)
-            {
-                obj.enabled = false;
-            }
-
-            foreach(Text obj in volumeText)
-            {
-                obj.enabled = false;
-            }
-
-            foreach(Button obj in guideButton)
-            {
-                obj.enabled = false;
-            }
-        
-            foreach(Image obj in guideImage)
-            {
-                obj.enabled = false;
-            }
-
-            foreach(Text obj in guideText)
-            {
-                obj.enabled = false;
-            }
-
-            //オプション設定値を示すイメージを非表示にする
-            volumeChecked[PlayerPrefs.GetInt("Volume")].enabled = false;
-            guideChecked[PlayerPrefs.GetInt("Guide")].enabled = false;             
+            optionSettingPanel.SwitchOptionSelectPanelDisplay(false);
+            optionSettingPanel.DisplaySelectedOptionValue(PlayerPrefs.GetInt("Volume"), PlayerPrefs.GetInt("Guide"), false);
         }
     }
 
 
-    //ステージセレクトボタン
+    /*
+    ステージセレクトボタン
+    */
     private static int startStage = 1;
 
     //ステージセレクトボタンがクリック時の処理
@@ -209,29 +114,20 @@ public class MenuController : MonoBehaviour
         SceneManager.sceneLoaded -= StartPositionSet;
     }
 
-
-    //オプションセレクトボタン
+    /*
+    オプション設定ボタン
+    */
     //音量調節ボタンクリック時の処理
     public void SetVolume(int volume)
     {
         PlayerPrefs.SetInt("Volume", volume);
-        //一旦設定値を示すボタンを全て非表示 -> 新たな設定値で再表示
-        foreach(Image obj in volumeChecked)
-        {
-            obj.enabled = false;
-        }
-        volumeChecked[PlayerPrefs.GetInt("Volume")].enabled = true;
+        optionSettingPanel.SetSelectedVolumeImage(volume);
     }
 
     //ガイド表示切替ボタンクリック時の処理
     public void SetGuide(int onOffFlag)
     {
         PlayerPrefs.SetInt("Guide", onOffFlag);
-        //一旦設定値を示すボタンを全て非表示 -> 新たな設定値で再表示
-        foreach(Image obj in guideChecked)
-        {
-            obj.enabled = false;
-        }
-        guideChecked[PlayerPrefs.GetInt("Guide")].enabled = true;
+        optionSettingPanel.SetSelectedGuideSettingImage(onOffFlag);
     }
 }
