@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
-    public Text scoreText;
     public Image stageProgressBar;
     public Text diskCountText;
     public  Image colorBar;
@@ -44,9 +43,6 @@ public class GameController : MonoBehaviour
     [SerializeField] Image colorStopImage1;
     [SerializeField] Image colorStopImage2;
     public static bool gamePause = false;
-    [SerializeField] Button[] menuButton;
-    [SerializeField] Image[] menuImage;
-    [SerializeField] Text[] menuText;
     //public static int reachStage;
     public int loadStage;
     public static bool restartFlag;
@@ -68,31 +64,17 @@ public class GameController : MonoBehaviour
     private GameObject focusObject;
     [SerializeField] Image gameOverBackground;
     [SerializeField] Text gameOverText;
-    [SerializeField] float speedDecrease = 1.0f;
     [SerializeField] Image gameClearBackground;
     [SerializeField] Text gameClearText;
     [SerializeField] GameObject gameClearSound;
     private bool gameClearFlag = false;
  
-    // Start is called before the first frame update
     void Start()
     {
         stageNumber = loadStage;
         LoadStage();
         playerStartPosition = (int) playerCamera.transform.position.z;
         stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 1.5f);
-        foreach(Button obj in menuButton)
-        {
-            obj.enabled = false;
-        }
-        foreach(Image obj in menuImage)
-        {
-            obj.enabled = false;
-        }
-        foreach(Text obj in menuText)
-        {
-            obj.enabled = false;
-        }
 
         if(PlayerPrefs.GetInt("Guide") == 1)
         {
@@ -104,11 +86,9 @@ public class GameController : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         diskCountText.text =  "Disk : " + diskCount;
-        //CalcScore();
         StageProgress();
         ColorBarUpdate();
         CheckItemGet();
@@ -228,19 +208,16 @@ public class GameController : MonoBehaviour
         {
             straightItemImage.enabled = true;
             straightItemButton.enabled = true;
-            //straightItemImage.color = new Color(straightItemImage.color.r, straightItemImage.color.g, straightItemImage.color.b, 255);
         }
         else if(diskInfinityItem)
         {
             diskInfinityItemImage.enabled = true;
             diskInfinityItemButton.enabled = true;
-            //diskInfinityItemImage.color = new Color(diskInfinityItemImage.color.r, diskInfinityItemImage.color.g, diskInfinityItemImage.color.b, 255);
         }
         else if(colorStopItem)
         {
             colorStopItemImage.enabled = true;
             colorStopItemButton.enabled = true;
-            //colorStopItemImage.color = new Color(colorStopItemImage.color.r, colorStopItemImage.color.g, colorStopItemImage.color.b, 255);
         }
     }
 
@@ -297,7 +274,6 @@ public class GameController : MonoBehaviour
             DiskGenerator.TappCancel();
             straightItem = false;
             straightItemImage.enabled = false;
-            //straightItemImage.color = new Color(straightItemImage.color.r, straightItemImage.color.g, straightItemImage.color.b, 50);
             straightUsing = true;
             straightTime = itemDuaration;
         }
@@ -325,22 +301,12 @@ public class GameController : MonoBehaviour
         colorStopTime = itemDuaration;
     }
 
+    public MenuPanel menuPanel;
     public void PauseGame()
     {
         gamePause = true;
         DiskGenerator.TappCancel();
-        foreach(Button obj in menuButton)
-        {
-            obj.enabled = true;
-        }
-        foreach(Image obj in menuImage)
-        {
-            obj.enabled = true;
-        }
-        foreach(Text obj in menuText)
-        {
-            obj.enabled = true;
-        }
+        menuPanel.SwitchMenuPanelDisplay(true);
     }
 
     public static bool ReturnPauseStatus()
@@ -351,33 +317,8 @@ public class GameController : MonoBehaviour
     public void RestartGame()
     {
         gamePause = false;
-        foreach(Button obj in menuButton)
-        {
-            obj.enabled = false;
-        }
-        foreach(Image obj in menuImage)
-        {
-            obj.enabled = false;
-        }
-        foreach(Text obj in menuText)
-        {
-            obj.enabled = false;
-        }
+        menuPanel.SwitchMenuPanelDisplay(false);
     }
-
-    /*
-    public void CheckPlayerStage()
-    {
-        float isStage = GameObject.FindWithTag("MainCamera").transform.position.z;
-        for(int i = 1;  i < stageLength.Length - 1; i++)
-        {
-            if(isStage > stageLength[i])
-            {
-                reachStage = i + 1;
-            }
-        }
-    }
-    */
 
     public void SceneReturn()
     {
