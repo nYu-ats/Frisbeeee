@@ -50,6 +50,8 @@ public class Polls : MonoBehaviour
     //ポップアップの親となるCanvas
     private GameObject uiCanvas;
     [SerializeField] float colorIncreaseCount = 1.0f; //赤もしくは青のポールにヒットした時のゲージの変動量
+    [SerializeField] int diskIncreaseNumber = 2; //白のポールにヒットした時のディスクの増加量
+
 
 
     void OnTriggerExit(Collider collision)
@@ -69,6 +71,7 @@ public class Polls : MonoBehaviour
             //タグでポップアップの種類を判断
             if(this.gameObject.tag == "WhitePoll")
             {
+                gameController.UpdateDiskCount(diskIncreaseNumber);
                 DisplayPopUp(diskIncreasePopUp);
             }
             else if(this.gameObject.tag == "RedPoll")

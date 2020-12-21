@@ -9,7 +9,6 @@ public class GameController : MonoBehaviour
     [SerializeField] Camera playerCamera;
     public Image stageProgressBar;
     public Text diskCountText;
-    public static int diskCount = 20;
     private int playerStartPosition;
     private float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
     public static int stageNumber;
@@ -119,10 +118,18 @@ public class GameController : MonoBehaviour
         }
     }
 
+    //カラーバーのステータス
     public float colorBarPosition = 0.0f;
     public void UpdateColorBarValue(float colorBarChangeValue)
     {
         colorBarPosition += colorBarChangeValue;
+    }
+
+    //ディスク残弾のステータス
+    public static int diskCount = 20;
+    public void UpdateDiskCount(int diskCountChangeValue)
+    {
+        diskCount += diskCountChangeValue;
     }
 
     public static bool ReturnDiskStatus()
@@ -337,6 +344,7 @@ public class GameController : MonoBehaviour
     private void InitializeGameStatus()
     {
         diskCount = 20;
+        //カラーバーのポジションを初期値にセット、UIをアップデートする
         colorBarPosition = 0.0f;
         colorBar.UpdateColorBar(colorBarPosition);
     }

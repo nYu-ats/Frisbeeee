@@ -70,7 +70,6 @@ public class Disk : MonoBehaviour
     [SerializeField] GameObject diskCrushParticle;
     [SerializeField] GameObject effectCollisionFlash;
     [SerializeField] int diskIncreaseNumberPoll;
-    [SerializeField] int colorIncreaseNumberPoll;
     [SerializeField] GameObject pollHitSound;
     [SerializeField] GameObject wallHitSound;
     private Vector3 collisionPosition;
@@ -84,8 +83,8 @@ public class Disk : MonoBehaviour
             if(!GameController.colorStopUsing)
             {
                 //青ポールをカットした時はゲージの青を増加
-                GameController.colorBarPosition -= colorIncreaseNumberPoll;
-                GameController.colorMarkPosition -= colorIncreaseNumberPoll;
+                //GameController.colorBarPosition -= colorIncreaseNumberPoll;
+                //GameController.colorMarkPosition -= colorIncreaseNumberPoll;
             }
         }
         else if(collision.gameObject.tag == "RedPoll")
@@ -93,14 +92,14 @@ public class Disk : MonoBehaviour
             //赤ポールをカットした時はゲージの赤を増加
             if(!GameController.colorStopUsing)
             {
-                GameController.colorBarPosition += colorIncreaseNumberPoll;
-                GameController.colorMarkPosition += colorIncreaseNumberPoll;
+                //GameController.colorBarPosition += colorIncreaseNumberPoll;
+                //GameController.colorMarkPosition += colorIncreaseNumberPoll;
             }
         }
         else if(collision.gameObject.tag == "WhitePoll")
         {
             //白ポールをカットした時はディスクを規定数回復
-            GameController.diskCount += diskIncreaseNumberPoll;
+            //GameController.diskCount += diskIncreaseNumberPoll;
         }
         //ポールヒット時のパーティクル、フラッシュ、効果音を再生
         Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(0, 0, 0));
