@@ -62,6 +62,7 @@ public class GameController : MonoBehaviour
     [SerializeField] Text gameClearText;
     [SerializeField] GameObject gameClearSound;
     private bool gameClearFlag = false;
+    public ColorBar colorBar;
  
     void Start()
     {
@@ -84,7 +85,7 @@ public class GameController : MonoBehaviour
     {
         diskCountText.text =  "Disk : " + diskCount;
         StageProgress();
-        //ColorBarUpdate();
+        colorBar.UpdateColorBar(colorBarPosition);
         CheckItemGet();
         ItemConsume();
         if(displayGuide)
@@ -116,6 +117,12 @@ public class GameController : MonoBehaviour
                 Invoke("SceneReturn", 5.0f);
             }
         }
+    }
+
+    public float colorBarPosition = 0.0f;
+    public void UpdateColorBarValue(float colorBarChangeValue)
+    {
+        colorBarPosition += colorBarChangeValue;
     }
 
     public static bool ReturnDiskStatus()
@@ -327,11 +334,11 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("Home");
     }
 
-    public ColorBar colorBar;
     private void InitializeGameStatus()
     {
         diskCount = 20;
-        colorBar.colorBarPosition = 0.0f;
+        colorBarPosition = 0.0f;
+        colorBar.UpdateColorBar(colorBarPosition);
     }
 
     public void LoadStage()

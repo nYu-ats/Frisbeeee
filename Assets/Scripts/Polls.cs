@@ -18,11 +18,11 @@ public class Polls : MonoBehaviour
     public float rootPositionZ; //rootオブジェクトのZ座標
     [SerializeField] float lifeTime = 5.0f; //カット後のポールの存在時間
 
-    public ColorBar colorBar;
+    public GameController gameController; 
 
     void Start()
     {
-        colorBar = GameObject.Find("ColorBarBackGround").GetComponent<ColorBar>(); //pollをprefab貸しており、インスペクターから設定できないためここでColorBarを結びつける
+        gameController = GameObject.Find("GameController").GetComponent<GameController>(); //prefab化されておりインスペクターから設定手出来ないのでスクリプトで紐づける
         victim = this.gameObject;
         capMaterial = victim.GetComponent<Renderer>().material;
         rootPositionZ = victim.transform.root.position.z;
@@ -73,12 +73,12 @@ public class Polls : MonoBehaviour
             }
             else if(this.gameObject.tag == "RedPoll")
             {
-                colorBar.UpdateColorBarStatus(colorIncreaseCount);
+                gameController.UpdateColorBarValue(colorIncreaseCount);
                 DisplayPopUp(redIncreasePopUp);
             }
             else if(this.gameObject.tag == "BluePoll")
             {
-                colorBar.UpdateColorBarStatus(-colorIncreaseCount);
+                gameController.UpdateColorBarValue(-colorIncreaseCount);
                 DisplayPopUp(blueIncreasePopUp);
             }
         }
