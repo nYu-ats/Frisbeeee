@@ -9,39 +9,27 @@ using BLINDED_AM_ME;
 
 public class Polls : MonoBehaviour
 {
-    //自身のgemeobjectを格納する変数
-    private GameObject victim;
-    //ポールの長辺方向の法線を格納する変数
-    private Vector3 normalDirection;
-    //衝突が発生した座標を格納する変数
-    private Vector3 anchorpoint;
-    //カット前のマテリアル
-    private Material capMaterial;
+    private GameObject victim; //自身のgemeobjectを格納する変数
+    private Vector3 normalDirection; //ポールの長辺方向の法線を格納する変数
+    private Vector3 anchorpoint; //衝突が発生した座標を格納する変数
+    private Material capMaterial;//カット前のマテリアル
     private Vector3 normalDirectionStd = new Vector3(0.0f, 1.0f, 0.0f);
-    //カット後のマテリアル
-    [SerializeField] Material cuttedMaterial;
-    //rootオブジェクトのZ座標
-    public float rootPositionZ;
-    //ポールが破壊されたときの、ディスク数とカラーバーの値の変化のポップアップ
-    [SerializeField] GameObject diskIncreasePopUp;
-    [SerializeField] GameObject blueIncreasePopUp;
-    [SerializeField] GameObject redIncreasePopUp;
+    [SerializeField] Material cuttedMaterial; //カット後のマテリアル
+    public float rootPositionZ; //rootオブジェクトのZ座標
     [SerializeField] float lifeTime = 5.0f; //カット後のポールの存在時間
-    //ポップアップの親となるCanvas
-    private GameObject uiCanvas;
 
+    public ColorBar colorBar;
 
     void Start()
     {
+        colorBar = GameObject.Find("ColorBarBackGround").GetComponent<ColorBar>(); //pollをprefab貸しており、インスペクターから設定できないためここでColorBarを結びつける
         victim = this.gameObject;
         capMaterial = victim.GetComponent<Renderer>().material;
         rootPositionZ = victim.transform.root.position.z;
         //Canvasを設定
         uiCanvas = GameObject.Find("Canvas");
-        /*
-        切断後のポールに対する処理
-        切断後、オブジェクトを少し回転させる
-        */
+        
+        //切断後のポールであればオブジェクトを少し回転させる
         if(victim.name == "right side")
         {
            victim.GetComponent<Rigidbody>().AddTorque(-10, 0, 0, ForceMode.Impulse);
@@ -53,6 +41,15 @@ public class Polls : MonoBehaviour
            StartCoroutine(DestroyCuttedPoll(this.gameObject, lifeTime));
         }
     }
+
+
+    //ポールが破壊されたときの、ディスク数とカラーバーの値の変化のポップアップ
+    [SerializeField] GameObject diskIncreasePopUp;
+    [SerializeField] GameObject blueIncreasePopUp;
+    [SerializeField] GameObject redIncreasePopUp;
+    //ポップアップの親となるCanvas
+    private GameObject uiCanvas;
+    [SerializeField] float colorIncreaseCount = 1.0f; //赤もしくは青のポールにヒットした時のゲージの変動量
 
 
     void OnTriggerExit(Collider collision)
@@ -76,10 +73,12 @@ public class Polls : MonoBehaviour
             }
             else if(this.gameObject.tag == "RedPoll")
             {
+                colorBar.UpdateColorBarStatus(colorIncreaseCount);
                 DisplayPopUp(redIncreasePopUp);
             }
             else if(this.gameObject.tag == "BluePoll")
             {
+                colorBar.UpdateColorBarStatus(-colorIncreaseCount);
                 DisplayPopUp(blueIncreasePopUp);
             }
         }

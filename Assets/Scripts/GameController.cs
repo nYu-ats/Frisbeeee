@@ -9,12 +9,6 @@ public class GameController : MonoBehaviour
     [SerializeField] Camera playerCamera;
     public Image stageProgressBar;
     public Text diskCountText;
-    public  Image colorBar;
-    public  Image colorMark;
-    [SerializeField] int colorChangeRate = 20;
-    [SerializeField] float colorMarkChangeRate = 12.5f;
-    public static float colorBarPosition = 0.0f;
-    public static float colorMarkPosition = 0.0f;
     public static int diskCount = 20;
     private int playerStartPosition;
     private float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
@@ -90,7 +84,7 @@ public class GameController : MonoBehaviour
     {
         diskCountText.text =  "Disk : " + diskCount;
         StageProgress();
-        ColorBarUpdate();
+        //ColorBarUpdate();
         CheckItemGet();
         ItemConsume();
         if(displayGuide)
@@ -160,11 +154,6 @@ public class GameController : MonoBehaviour
                 stageNumber += 1;
             }
         }
-    }
-    void ColorBarUpdate()
-    {
-        colorBar.GetComponent<RectTransform>().localPosition = new Vector2(colorBarPosition * colorChangeRate, 0);
-        colorMark.GetComponent<RectTransform>().localPosition = new Vector2(colorMarkPosition * colorMarkChangeRate, 0);
     }
 
     public static void GetItem(string item)
@@ -338,11 +327,11 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("Home");
     }
 
+    public ColorBar colorBar;
     private void InitializeGameStatus()
     {
         diskCount = 20;
-        colorBarPosition = 0.0f;
-        colorMarkPosition = 0.0f;
+        colorBar.colorBarPosition = 0.0f;
     }
 
     public void LoadStage()
