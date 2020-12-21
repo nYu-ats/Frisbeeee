@@ -62,6 +62,7 @@ public class GameController : MonoBehaviour
     [SerializeField] GameObject gameClearSound;
     private bool gameClearFlag = false;
     public ColorBar colorBar;
+    public DiskCount diskCountUI;
  
     void Start()
     {
@@ -82,7 +83,7 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        diskCountText.text =  "Disk : " + diskCount;
+        diskCountUI.UpdateDiskCountUI(diskCount);
         StageProgress();
         colorBar.UpdateColorBar(colorBarPosition);
         CheckItemGet();
