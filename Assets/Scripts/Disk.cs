@@ -17,10 +17,12 @@ public class Disk : MonoBehaviour
     private float addForceY;
     private float addForceZ;
     private float cameraSpeed;
+    public GameController gameController;
 
 
     void Start()
     {
+        gameController = GameObject.Find("GameController").GetComponent<GameController>(); //prefab化されておりインスペクターから設定手出来ないのでスクリプトで紐づける
         cameraSpeed = CameraMove.ReturnCameraSpeed();
         //初期で加える力を射出方向に分解
         addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
@@ -49,7 +51,7 @@ public class Disk : MonoBehaviour
     {
         //ディスクを直進させるアイテムを使っている時は起動の調整はしない
         //アイテム未使用状態の時は一定後からでカーブさせる
-        if(GameController.straightUsing)
+        if(gameController.ReturnItemUsingStatus("Straight"))
         {
             return;
         }
@@ -69,42 +71,21 @@ public class Disk : MonoBehaviour
     [SerializeField] GameObject pollCutParticle;
     [SerializeField] GameObject diskCrushParticle;
     [SerializeField] GameObject effectCollisionFlash;
-    [SerializeField] int diskIncreaseNumberPoll;
     [SerializeField] GameObject pollHitSound;
     [SerializeField] GameObject wallHitSound;
     private Vector3 collisionPosition;
 
     void OnTriggerEnter(Collider collision)
     {
-        //衝突が発生した位置で効果音とパーティクルを再生する
-        collisionPosition = this.transform.position;
-        if(collision.gameObject.tag == "BluePoll")
-        {
-            if(!GameController.colorStopUsing)
-            {
-                //青ポールをカットした時はゲージの青を増加
-                //GameController.colorBarPosition -= colorIncreaseNumberPoll;
-                //GameController.colorMarkPosition -= colorIncreaseNumberPoll;
-            }
-        }
-        else if(collision.gameObject.tag == "RedPoll")
-        {
-            //赤ポールをカットした時はゲージの赤を増加
-            if(!GameController.colorStopUsing)
-            {
-                //GameController.colorBarPosition += colorIncreaseNumberPoll;
-                //GameController.colorMarkPosition += colorIncreaseNumberPoll;
-            }
-        }
-        else if(collision.gameObject.tag == "WhitePoll")
-        {
-            //白ポールをカットした時はディスクを規定数回復
-            //GameController.diskCount += diskIncreaseNumberPoll;
-        }
         //ポールヒット時のパーティクル、フラッシュ、効果音を再生
-        Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(0, 0, 0));
-        Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(0, 0, 0));
-        Instantiate(pollCutParticle, collisionPosition, Quaternion.Euler(0, 0, 0));
+        if((collision.gameObject.tag == "WhitePoll") | (collision.gameObject.tag == "RedPoll") | (collision.gameObject.tag == "BluePoll"))
+        {
+            collisionPosition = this.transform.position; //衝突が発生した位置
+            Instantiate(pollHitSound, collisionPosition, Quaternion.Euler(0, 0, 0));
+            Instantiate(effectCollisionFlash, collisionPosition, Quaternion.Euler(0, 0, 0));
+            Instantiate(pollCutParticle, collisionPosition, Quaternion.Euler(0, 0, 0));
+
+        }
     }
 
     //壁にはトリガーはつけていないので、壁に衝突した時の効果はOnCollisionEnterで再生する    

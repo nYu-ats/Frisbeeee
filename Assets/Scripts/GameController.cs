@@ -21,11 +21,11 @@ public class GameController : MonoBehaviour
     [SerializeField] Image diskInfinityItemImage;
     [SerializeField] Button diskInfinityItemButton;
 
-    public static bool straightItem = false;
-    public static bool colorStopItem = false;
-    public static bool diskInfinityItem = false;
-    public static bool straightUsing = false;
-    public static bool infinitytUsing = false;
+    public bool straightItem = false;
+    public bool colorStopItem = false;
+    public bool diskInfinityItem = false;
+    public bool straightUsing = false;
+    public bool infinitytUsing = false;
     public static bool colorStopUsing = false;
     [SerializeField] float itemDuaration = 5.0f;
     private float straightTime = 0.0f;
@@ -171,7 +171,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public static void GetItem(string item)
+    public void GetItem(string item)
     {
         if(item == "Straight")
         {
@@ -187,7 +187,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public static bool ReturnItemStatus(string item)
+    public bool ReturnItemStatus(string item)
     {
         if(item == "Straight")
         {
@@ -205,6 +205,27 @@ public class GameController : MonoBehaviour
         {
             return false;
         }
+    }
+
+    public bool ReturnItemUsingStatus(string item)
+    {
+        if(item == "Straight")
+        {
+            return straightUsing;
+        }
+        else if(item == "Infinity")
+        {
+            return infinitytUsing;
+        }
+        else if(item == "ColorStop")
+        {
+            return colorStopUsing;
+        }
+        else
+        {
+            return false;
+        }
+
     }
     void CheckItemGet()
     {

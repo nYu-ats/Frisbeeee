@@ -19,8 +19,10 @@ public class DiskGenerator : MonoBehaviour
     [SerializeField] float adjustDiskGeneratePositionZ = 1.0f;
     public static bool diskGenerateFlag;//アイテム消費やゲームポーズボタンを押したときにディスクの生成をしないようにするためのフラグ 
 
+    public GameController gameController;
     void Start()
     {
+        gameController = GameObject.Find("GameController").GetComponent<GameController>(); //DiskやPollのスクリプト同様にスクリプトから紐づけるようにする
         diskGenerateFlag = false;
     }
 
@@ -58,7 +60,7 @@ public class DiskGenerator : MonoBehaviour
                     disk.GetComponent<Disk>().direction = ReleaseDirection(tapStartPosition, tapReleasePosition); //生成したディスクの射出角度をセットする
                     
                     //ディスク減少を止めるアイテムを使用していない場合のみ、ディスク生成後にディスクの数を減少させる
-                    if(!GameController.infinitytUsing)
+                    if(!gameController.ReturnItemUsingStatus("Infinity"))
                     {
                         GameController.diskCount -= 1;
                         GameObject popUp = Instantiate(diskDecreasePopUp);
