@@ -76,6 +76,7 @@ public class Polls : MonoBehaviour
             }
             else if(this.gameObject.tag == "RedPoll")
             {
+                
                 gameController.UpdateColorBarValue(colorIncreaseCount);
                 DisplayPopUp(redIncreasePopUp);
             }

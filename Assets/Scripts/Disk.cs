@@ -24,7 +24,7 @@ public class Disk : MonoBehaviour
     {
         gameController = GameObject.Find("GameController").GetComponent<GameController>(); //prefab化されておりインスペクターから設定手出来ないのでスクリプトで紐づける
         cameraSpeed = CameraMove.ReturnCameraSpeed();
-        //初期で加える力を射出方向に分解
+        //加える力を3軸方向に分解
         addForceX = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Sin(direction.x * (Mathf.PI / 180.0f));
         addForceY = addForce * Mathf.Sin(direction.y * (Mathf.PI / 180.0f));
         addForceZ = addForce * Mathf.Cos(direction.y * (Mathf.PI / 180.0f)) * Mathf.Cos(direction.x * (Mathf.PI / 180.0f));
@@ -49,7 +49,7 @@ public class Disk : MonoBehaviour
 
     void Update()
     {
-        //ディスクを直進させるアイテムを使っている時は起動の調整はしない
+        //ディスクを直進させるアイテムを使っている時はカーブさせない
         //アイテム未使用状態の時は一定後からでカーブさせる
         if(gameController.ReturnItemUsingStatus("Straight"))
         {
@@ -78,6 +78,7 @@ public class Disk : MonoBehaviour
     void OnTriggerEnter(Collider collision)
     {
         //ポールヒット時のパーティクル、フラッシュ、効果音を再生
+        //アイテムもトリガーがtrueになっているため、ポールヒット時かどうかif文で判定する
         if((collision.gameObject.tag == "WhitePoll") | (collision.gameObject.tag == "RedPoll") | (collision.gameObject.tag == "BluePoll"))
         {
             collisionPosition = this.transform.position; //衝突が発生した位置

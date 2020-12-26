@@ -18,6 +18,7 @@ public class CameraMove : MonoBehaviour
     private bool proceedFlag = false;
     //カメラを減速させる速度
     private float decreaseSpeed = 0.5f;
+    public GameController gameController;
 
     void Start()
     {
@@ -33,7 +34,7 @@ public class CameraMove : MonoBehaviour
         ステージ2と3はSpeed : 10
         ディスクが0(ゲームオーバー)になったら、カメラの動きを止める
         */
-        if(GameController.ReturnDiskStatus())
+        if(!gameController.ReturnCameraStopFlag())
         {
             if(GameController.stageNumber == 1)
             {
@@ -53,7 +54,7 @@ public class CameraMove : MonoBehaviour
         }
 
         //ゲームポーズ中、動きを止める
-        if(GameController.ReturnPauseStatus())
+        if(gameController.ReturnPauseStatus())
         {
             Time.timeScale = 0.0f;
         }
@@ -66,7 +67,7 @@ public class CameraMove : MonoBehaviour
         ゲームリスタートが発生した場合、一旦移動を止めて
         位置を再セット
         */
-        if(GameController.ReturnRestartStatus())
+        if(gameController.ReturnRestartStatus())
         {
             proceedFlag = false;
             StartCoroutine(CameraPositionSet(stayTime));

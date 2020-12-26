@@ -22,7 +22,6 @@ public class DiskGenerator : MonoBehaviour
     public GameController gameController;
     void Start()
     {
-        gameController = GameObject.Find("GameController").GetComponent<GameController>(); //DiskやPollのスクリプト同様にスクリプトから紐づけるようにする
         diskGenerateFlag = false;
     }
 
@@ -30,10 +29,10 @@ public class DiskGenerator : MonoBehaviour
     void Update()
     {
         //ディスク残団が0の場合はゲームオーバーなのでディスクは生成しない
-        if(GameController.ReturnDiskStatus())
+        if(gameController.ReturnDiskStatus())
         {
             //ゲームポーズ中はディスクを生成しない
-            if(!GameController.ReturnPauseStatus())
+            if(!gameController.ReturnPauseStatus())
             {
                 if(Input.GetMouseButtonDown(0))
                 {

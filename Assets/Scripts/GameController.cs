@@ -7,12 +7,9 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
-    public Image stageProgressBar;
-    public Text diskCountText;
     private int playerStartPosition;
-    private float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
+    private float totalStageLength = 14101.0f;
     public static int stageNumber;
-    private int stageProgressBarLength = 1000;
     [SerializeField] Image straightItemImage;
     [SerializeField] Button straightItemButton;
     [SerializeField] Image colorStopItemImage;
@@ -36,137 +33,122 @@ public class GameController : MonoBehaviour
     [SerializeField] Image colorStopImage1;
     [SerializeField] Image colorStopImage2;
     public static bool gamePause = false;
-    //public static int reachStage;
     public int loadStage;
     public static bool restartFlag;
-    private bool displayGuide;
-    [SerializeField] float displayTime = 5.0f;
-    [SerializeField] Image guideFlickImage;
-    [SerializeField] Text guideFlickText;
-    [SerializeField] Image guideWhitePollImage;
-    [SerializeField] Text guideWhitePollText;
-    [SerializeField] Image guideColorPollImage;
-    [SerializeField] Text guideColorPollText;
-    [SerializeField] Image guideObstacleImage;
-    [SerializeField] Text guideObstacleText;
-    [SerializeField] Image guideGameOverImage;
-    [SerializeField] Text guideGameOverText;
-    [SerializeField] Image guideSwitchImage;
-    [SerializeField] Text guideSwitchText;
-    [SerializeField] GameObject guideSwitchFocus;
-    private GameObject focusObject;
-    [SerializeField] Image gameOverBackground;
-    [SerializeField] Text gameOverText;
-    [SerializeField] Image gameClearBackground;
-    [SerializeField] Text gameClearText;
-    [SerializeField] GameObject gameClearSound;
-    private bool gameClearFlag = false;
     public ColorBar colorBar;
     public DiskCount diskCountUI;
+    public GameOver gameOverUI;
+    public GameClear gameClearUI;
+    public bool cameraStopFlag = false;
  
     void Start()
     {
         stageNumber = loadStage;
         LoadStage();
         playerStartPosition = (int) playerCamera.transform.position.z;
-        stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 1.5f);
-
-        if(PlayerPrefs.GetInt("Guide") == 1)
-        {
-            displayGuide = true;
-        }
-        else
-        {
-            displayGuide = false;
-        }
+        stageProgress.ResestProgressBarStatus();
     }
 
     void Update()
     {
         diskCountUI.UpdateDiskCountUI(diskCount);
-        StageProgress();
+        StageManagement();
         colorBar.UpdateColorBar(colorBarPosition);
         CheckItemGet();
         ItemConsume();
-        if(displayGuide)
+        if(diskCount <= 0 | colorBarPosition > 10 | colorBarPosition < -10)
         {
-            DisplayGuide();
-        }
-
-        if(diskCount <= 0)
-        {
-            gameOverBackground.enabled = true;
+            cameraStopFlag = true;
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
-                gameOverText.enabled = true;
+                gameOverUI.DisplayGameOverMessage();
                 Invoke("SceneReturn", 3.0f);
             }
         }
 
         if(playerCamera.transform.position.z >= stageLength[3])
         {
+            cameraStopFlag = true;
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
-                gameClearText.enabled = true;
-                gameClearBackground.enabled = true;
-                if(!gameClearFlag)
-                {
-                    Instantiate(gameClearSound, playerCamera.transform.position, Quaternion.Euler(0, 0, 0));
-                    gameClearFlag = true;
-                }
+                gameClearUI.DisplayGameClearEffect(playerCamera.transform.position);
                 Invoke("SceneReturn", 5.0f);
             }
         }
     }
 
-    //カラーバーのステータス
+    //カラーバーのステータス更新
+    //赤or青のポールが破壊されたときに呼び出される
     public float colorBarPosition = 0.0f;
     public void UpdateColorBarValue(float colorBarChangeValue)
     {
         colorBarPosition += colorBarChangeValue;
     }
 
-    //ディスク残弾のステータス
+    //ディスク残弾の更新
     public static int diskCount = 20;
     public void UpdateDiskCount(int diskCountChangeValue)
     {
         diskCount += diskCountChangeValue;
     }
 
-    public static bool ReturnDiskStatus()
+    public bool ReturnDiskStatus()
     {
         return diskCount > 0;
     }
 
-    public static bool ReturnRestartStatus()
+    public bool ReturnCameraStopFlag()
+    {
+        return cameraStopFlag;
+    }
+
+    public bool ReturnRestartStatus()
     {
         return restartFlag;
     }
-    void StageProgress()
+    
+
+    public StageProgressBar stageProgress;
+    public float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
+
+    public float[] ReturnStageConstitution()
+    {
+        return stageLength;
+    }
+
+    private void StageManagement()
     {
         if(stageNumber == 1)
         {
-            if((playerCamera.transform.position.z - stageLength[stageNumber - 1]) <= stageLength[stageNumber])
+            if(playerCamera.transform.position.z <= stageLength[stageNumber])
             {
-
-                stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2((playerCamera.transform.position.z - stageLength[stageNumber - 1]) / stageLength[stageNumber] * stageProgressBarLength, 1.5f);
+                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
             }
             else
             {
-                stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 1.5f);
+                stageProgress.ResestProgressBarStatus();
                 stageNumber += 1;
             }
         }
+
         if(stageNumber == 2)
         {
-            if((playerCamera.transform.position.z - stageLength[stageNumber - 1]) <= stageLength[stageNumber])
+            if(playerCamera.transform.position.z <= stageLength[stageNumber])
             {
-                stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2((playerCamera.transform.position.z - stageLength[stageNumber - 1]) / stageLength[stageNumber] * stageProgressBarLength, 1.5f);
+                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
             }
             else
             {
-                stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, 1.5f);
+                stageProgress.ResestProgressBarStatus();
                 stageNumber += 1;
+            }
+        }
+
+        if(stageNumber == 3)
+        {
+            if(playerCamera.transform.position.z <= stageLength[stageNumber])
+            {
+                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
             }
         }
     }
@@ -326,7 +308,7 @@ public class GameController : MonoBehaviour
         colorStopTime = itemDuaration;
     }
 
-    public MenuPanel menuPanel;
+    public MenuPanelButton menuPanel;
     public void PauseGame()
     {
         gamePause = true;
@@ -334,7 +316,7 @@ public class GameController : MonoBehaviour
         menuPanel.SwitchMenuPanelDisplay(true);
     }
 
-    public static bool ReturnPauseStatus()
+    public bool ReturnPauseStatus()
     {
         return gamePause;
     }
@@ -387,73 +369,5 @@ public class GameController : MonoBehaviour
     public static void ReadyToRestart()
     {
         restartFlag = false;
-    }
-
-    private void DisplayGuide()
-    {
-        if(Mathf.Floor(playerCamera.transform.position.z) == 100)
-        {
-            guideFlickImage.enabled = true;
-            guideFlickText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideFlickImage, guideFlickText, displayTime));
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 200)
-        {
-            guideWhitePollImage.enabled = true;
-            guideWhitePollText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideWhitePollImage, guideWhitePollText, displayTime));
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 320)
-        {
-            guideColorPollImage.enabled = true;
-            guideColorPollText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideColorPollImage, guideColorPollText, displayTime));
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 520)
-        {
-            guideObstacleImage.enabled = true;
-            guideObstacleText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideObstacleImage, guideObstacleText, displayTime));
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 670)
-        {
-            guideGameOverImage.enabled = true;
-            guideGameOverText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideGameOverImage, guideGameOverText, displayTime));
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 3020)
-        {
-            guideSwitchImage.enabled = true;
-            guideSwitchText.enabled = true;
-            StartCoroutine(DisactivateGuide(guideSwitchImage, guideSwitchText, displayTime)); 
-        }
-
-        if(Mathf.Floor(playerCamera.transform.position.z) == 3020)
-        {
-            GameObject check = GameObject.FindWithTag("SwitchFocus");
-            if(check == null)
-            {
-                focusObject = Instantiate(guideSwitchFocus);
-                StartCoroutine(DisactivateFocusSwitch(focusObject, displayTime));
-            }
-        }
-    }
-
-    IEnumerator DisactivateGuide(Image image, Text text, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        image.enabled = false;
-        text.enabled = false;
-    }
-
-    IEnumerator DisactivateFocusSwitch(GameObject obj, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        Destroy(focusObject);
     }
 }

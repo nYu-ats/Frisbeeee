@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public class MenuPanel : MonoBehaviour
+public class MenuPanelButton : MonoBehaviour
 {
     public Button[] eachMenuButton;
     public Image[] eachMenuImage;
