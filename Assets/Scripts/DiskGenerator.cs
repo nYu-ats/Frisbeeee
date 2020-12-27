@@ -29,7 +29,7 @@ public class DiskGenerator : MonoBehaviour
     void Update()
     {
         //ディスク残団が0の場合はゲームオーバーなのでディスクは生成しない
-        if(gameController.ReturnDiskStatus())
+        if(gameController.ReturnDiskCount() > 0)
         {
             //ゲームポーズ中はディスクを生成しない
             if(!gameController.ReturnPauseStatus())

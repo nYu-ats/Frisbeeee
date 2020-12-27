@@ -23,6 +23,38 @@ public class CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        ChangeCameraSpeed();
+        //ゲームポーズ中、動きを止める
+        if(gameController.ReturnPauseStatus())
+        {
+            Time.timeScale = 0.0f;
+        }
+        else
+        {
+            Time.timeScale = 1.0f;
+        }
+
+        /*
+        ステージはじめからリスタートが発生した場合、一旦移動を止めて
+        位置を再セット
+        */
+        if(gameController.ReturnRestartStatus())
+        {
+            proceedFlag = false;
+            StartCoroutine(CameraPositionSet(stayTime));
+            GameController.SetRestartFlag(false);
+        }
+        
+        //カメラを移動させる処理
+        if(proceedFlag)
+        {
+            positionZ += moveSpeed * Time.deltaTime;
+            this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, positionZ);
+        }
+    }
+
+    private void ChangeCameraSpeed()
+    {
         /*
         カメラの移動速度を調整する処理
         ステージ1 -> moveSpeed : 5
@@ -46,34 +78,6 @@ public class CameraMove : MonoBehaviour
             {
                 moveSpeed -= decreaseSpeed;
             }
-        }
-
-        //ゲームポーズ中、動きを止める
-        if(gameController.ReturnPauseStatus())
-        {
-            Time.timeScale = 0.0f;
-        }
-        else
-        {
-            Time.timeScale = 1.0f;
-        }
-
-        /*
-        ゲームリスタートが発生した場合、一旦移動を止めて
-        位置を再セット
-        */
-        if(gameController.ReturnRestartStatus())
-        {
-            proceedFlag = false;
-            StartCoroutine(CameraPositionSet(stayTime));
-            GameController.SetRestartFlag(false);
-        }
-        
-        //カメラを移動させる処理
-        if(proceedFlag)
-        {
-            positionZ += moveSpeed * Time.deltaTime;
-            this.transform.position = new Vector3(cameraPosition.x, cameraPosition.y, positionZ);
         }
     }
 

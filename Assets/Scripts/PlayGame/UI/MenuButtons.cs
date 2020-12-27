@@ -36,7 +36,7 @@ public class MenuButtons : MonoBehaviour
         DisableMenuPanel();
         gameController.InitializeGameStatus();
         gameController.SetReachedStage();
-        SceneManager.LoadScene("Home");
+        gameController.ReturnToHome();;
     }
 
 }

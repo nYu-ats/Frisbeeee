@@ -11,7 +11,6 @@ public class GameController : MonoBehaviour
     public static bool gamePause = false;
     public int loadStage; //ホーム画面からスタートステージをセットするための変数
     public ColorBar colorBarUI;
-    public DiskCount diskCountUI;
     public GameOver gameOverUI;
     public GameClear gameClearUI;
     public static bool cameraStopFlag = false;
@@ -29,9 +28,6 @@ public class GameController : MonoBehaviour
         CheckGameOver();
         CheckGameClear();
         ItemUsingTimeControl();
-        //UIの更新
-        diskCountUI.UpdateDiskCountUI(diskCount);
-        colorBarUI.UpdateColorBar(colorBarPosition);
     }
 
     /*
@@ -48,8 +44,9 @@ public class GameController : MonoBehaviour
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameOverUI.DisplayGameOverMessage();
+                InitializeGameStatus();
                 SetReachedStage();
-                Invoke("SceneReturn", 3.0f);
+                Invoke("ReturnToHome", 3.0f);
             }
         }
     }
@@ -65,10 +62,17 @@ public class GameController : MonoBehaviour
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameClearUI.DisplayGameClearEffect(playerCamera.transform.position);
+                InitializeGameStatus();
                 SetReachedStage();
-                Invoke("SceneReturn", 5.0f);
+                Invoke("ReturnToHome", 5.0f);
             }
         }
+    }
+
+    //ゲームオーバーもしくはゲームクリア時のInvokeにメソッド名を文字列で渡す必要があるため
+    public void ReturnToHome()
+    {
+        SceneManager.LoadScene("Home");
     }
 
     //カラーバーのステータス更新
@@ -78,16 +82,20 @@ public class GameController : MonoBehaviour
         colorBarPosition += colorBarChangeValue;
     }
 
+    public float GetColorBarPosition()
+    {
+        return colorBarPosition;
+    }
+
     //ディスク残弾の更新
     public static int diskCount = 20;
     public void UpdateDiskCount(int diskCountChangeValue)
     {
         diskCount += diskCountChangeValue;
     }
-
-    public bool ReturnDiskStatus()
+    public int ReturnDiskCount()
     {
-        return diskCount > 0;
+        return diskCount;
     }
 
     public bool ReturnCameraStopFlag()
@@ -272,9 +280,6 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public DiskGenerator diskGenerator;
-
-    public MenuPanelButton menuPanelButton;
 
     public bool ReturnPauseStatus()
     {
@@ -295,7 +300,6 @@ public class GameController : MonoBehaviour
         diskCount = 20;
         //カラーバーのポジションを初期値にセット、UIをアップデートする
         colorBarPosition = 0.0f;
-        colorBarUI.UpdateColorBar(colorBarPosition);
     }
 
     //"ホームへ戻る"ボタンでも使用する処理だが、ゲーム状態に関わる処理で、ゲームオーバーもしくはゲームクリア時にも必要な操作なため
@@ -326,7 +330,7 @@ public class GameController : MonoBehaviour
         return stageNumber;
     }
 
-    public static bool restartFlag; 
+    public static bool restartFlag; //ステージはじめからリスタート時に、カメラの移動
     public bool ReturnRestartStatus()
     {
         return restartFlag;

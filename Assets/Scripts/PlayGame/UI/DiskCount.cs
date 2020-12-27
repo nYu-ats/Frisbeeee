@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//ディスクの残弾を表示する
 public class DiskCount : MonoBehaviour
 {
     public Text diskCountText;
+    [SerializeField] GameController gameController;
 
-    public void UpdateDiskCountUI(int diskCount)
+    void Update()
     {
-        diskCountText.text = "残弾 : " + diskCount;   
+        UpdateDiskCountUI();
+    }
+    public void UpdateDiskCountUI()
+    {
+        diskCountText.text = "残弾 : " + gameController.ReturnDiskCount();   
     }
 }
