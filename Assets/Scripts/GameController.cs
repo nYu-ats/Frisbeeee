@@ -8,34 +8,20 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
     private int playerStartPosition;
-    private float totalStageLength = 14101.0f;
     public static int stageNumber;
-    [SerializeField] Image straightItemImage;
-    [SerializeField] Button straightItemButton;
-    [SerializeField] Image colorStopItemImage;
-    [SerializeField] Button colorStopItemButton;
-
-    [SerializeField] Image diskInfinityItemImage;
-    [SerializeField] Button diskInfinityItemButton;
-
     public bool straightItem = false;
     public bool colorStopItem = false;
     public bool diskInfinityItem = false;
     public bool straightUsing = false;
     public bool infinitytUsing = false;
     public static bool colorStopUsing = false;
-    [SerializeField] float itemDuaration = 5.0f;
     private float straightTime = 0.0f;
     private float infinityTime = 0.0f;
     private float colorStopTime = 0.0f;
-    [SerializeField] Image infinityUsingImage1;
-    [SerializeField] Image infinityUsingImage2;
-    [SerializeField] Image colorStopImage1;
-    [SerializeField] Image colorStopImage2;
     public static bool gamePause = false;
     public int loadStage;
     public static bool restartFlag;
-    public ColorBar colorBar;
+    public ColorBar colorBarUI;
     public DiskCount diskCountUI;
     public GameOver gameOverUI;
     public GameClear gameClearUI;
@@ -44,18 +30,17 @@ public class GameController : MonoBehaviour
     void Start()
     {
         stageNumber = loadStage;
-        LoadStage();
+        playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
         playerStartPosition = (int) playerCamera.transform.position.z;
         stageProgress.ResestProgressBarStatus();
     }
 
     void Update()
     {
+        StageProgressManagement();
         diskCountUI.UpdateDiskCountUI(diskCount);
-        StageManagement();
-        colorBar.UpdateColorBar(colorBarPosition);
-        CheckItemGet();
-        ItemConsume();
+        colorBarUI.UpdateColorBar(colorBarPosition);
+        ItemUsingTimeControl();
         if(diskCount <= 0 | colorBarPosition > 10 | colorBarPosition < -10)
         {
             cameraStopFlag = true;
@@ -116,7 +101,7 @@ public class GameController : MonoBehaviour
         return stageLength;
     }
 
-    private void StageManagement()
+    private void StageProgressManagement()
     {
         if(stageNumber == 1)
         {
@@ -153,23 +138,23 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void GetItem(string item)
+    public void SetHaveItemStatus(string item, bool status)
     {
         if(item == "Straight")
         {
-            straightItem = true;
+            straightItem = status;
         }
         else if(item == "Infinity")
         {
-            diskInfinityItem = true;
+            diskInfinityItem = status;
         }
         else if(item == "ColorStop")
         {
-            colorStopItem = true;
+            colorStopItem = status;
         }
     }
 
-    public bool ReturnItemStatus(string item)
+    public bool GetHaveItemStatus(string item)
     {
         if(item == "Straight")
         {
@@ -188,6 +173,26 @@ public class GameController : MonoBehaviour
             return false;
         }
     }
+
+    public void SetItemUseStatus(string item, bool status, float itemUseTime)
+    {
+        if(item == "Straight")
+        {
+            straightUsing = status;
+            straightTime = itemUseTime;
+        }
+        else if(item == "Infinity")
+        {
+            infinitytUsing = status;
+            infinityTime = itemUseTime;
+        }
+        else if(item == "ColorStop")
+        {
+            colorStopUsing = status;
+            colorStopTime = itemUseTime;
+        }
+    }
+
 
     public bool ReturnItemUsingStatus(string item)
     {
@@ -209,26 +214,8 @@ public class GameController : MonoBehaviour
         }
 
     }
-    void CheckItemGet()
-    {
-        if(straightItem)
-        {
-            straightItemImage.enabled = true;
-            straightItemButton.enabled = true;
-        }
-        else if(diskInfinityItem)
-        {
-            diskInfinityItemImage.enabled = true;
-            diskInfinityItemButton.enabled = true;
-        }
-        else if(colorStopItem)
-        {
-            colorStopItemImage.enabled = true;
-            colorStopItemButton.enabled = true;
-        }
-    }
 
-    void ItemConsume()
+    void ItemUsingTimeControl()
     {
         if(straightUsing)
         {
@@ -253,8 +240,6 @@ public class GameController : MonoBehaviour
             {
                 infinityTime = 0.0f;
                 infinitytUsing = false;
-                infinityUsingImage1.enabled = false;
-                infinityUsingImage2.enabled = false;
             }
         }
 
@@ -268,51 +253,17 @@ public class GameController : MonoBehaviour
             {
                 colorStopTime = 0.0f;
                 colorStopUsing = false;
-                colorStopImage1.enabled = false;
-                colorStopImage2.enabled = false;
             }
         }
     }
 
-    public void StraightItemUse()
-    {
-        if(straightItem)
-        {
-            DiskGenerator.TappCancel();
-            straightItem = false;
-            straightItemImage.enabled = false;
-            straightUsing = true;
-            straightTime = itemDuaration;
-        }
-    }
-
-    public void InfinityItemUse()
-    {
-        DiskGenerator.TappCancel();
-        diskInfinityItem = false;
-        diskInfinityItemImage.enabled = false;
-        infinityUsingImage1.enabled = true;
-        infinityUsingImage2.enabled = true;
-        infinitytUsing = true;
-        infinityTime = itemDuaration;
-    }
-
-    public void ColorStopItemUse()
-    {
-        DiskGenerator.TappCancel();
-        colorStopItem = false;
-        colorStopItemImage.enabled = false;
-        colorStopImage1.enabled = true;
-        colorStopImage2.enabled = true;
-        colorStopUsing = true;
-        colorStopTime = itemDuaration;
-    }
+    public DiskGenerator diskGenerator;
 
     public MenuPanelButton menuPanel;
     public void PauseGame()
     {
         gamePause = true;
-        DiskGenerator.TappCancel();
+        diskGenerator.TappCancel();
         menuPanel.SwitchMenuPanelDisplay(true);
     }
 
@@ -350,12 +301,7 @@ public class GameController : MonoBehaviour
         diskCount = 20;
         //カラーバーのポジションを初期値にセット、UIをアップデートする
         colorBarPosition = 0.0f;
-        colorBar.UpdateColorBar(colorBarPosition);
-    }
-
-    public void LoadStage()
-    {
-        playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
+        colorBarUI.UpdateColorBar(colorBarPosition);
     }
 
     public void RestartStage()
@@ -363,7 +309,7 @@ public class GameController : MonoBehaviour
         RestartGame();
         restartFlag = true;
         InitializeGameStatus();
-        LoadStage();
+        playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
     }
 
     public static void ReadyToRestart()

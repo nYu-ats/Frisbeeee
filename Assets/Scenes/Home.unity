@@ -1236,7 +1236,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1879,7 +1879,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3752,6 +3752,7 @@ GameObject:
   - component: {fileID: 1578095150}
   - component: {fileID: 1578095152}
   - component: {fileID: 1578095151}
+  - component: {fileID: 1578095153}
   m_Layer: 5
   m_Name: StageChoise
   m_TagString: Untagged
@@ -3819,6 +3820,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1578095149}
   m_CullTransparentMesh: 0
+--- !u!114 &1578095153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578095149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8eca9a26abe24744893c84cf7537c7cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eachStageButton:
+  - {fileID: 177689005}
+  - {fileID: 1001033178}
+  - {fileID: 1969471998}
+  eachStageImage:
+  - {fileID: 177689006}
+  - {fileID: 1001033179}
+  - {fileID: 1969471999}
+  eachStageText:
+  - {fileID: 610227748}
+  - {fileID: 495698211}
+  - {fileID: 1599726329}
+  returnButton: {fileID: 1292721148}
+  returnImage: {fileID: 1292721146}
+  returnIcon: {fileID: 94569153}
+  panelBackground: {fileID: 1578095151}
 --- !u!1 &1599726327
 GameObject:
   m_ObjectHideFlags: 0
@@ -3908,6 +3937,7 @@ GameObject:
   - component: {fileID: 1669804992}
   - component: {fileID: 1669804994}
   - component: {fileID: 1669804993}
+  - component: {fileID: 1669804995}
   m_Layer: 5
   m_Name: OptionSettings
   m_TagString: Untagged
@@ -3974,6 +4004,57 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1669804991}
   m_CullTransparentMesh: 0
+--- !u!114 &1669804995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1669804991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577a65c994b9fe34fa9dfcaa63b6e2d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  volumeButton:
+  - {fileID: 2037307740}
+  - {fileID: 1745922867}
+  - {fileID: 1515278134}
+  volumeImage:
+  - {fileID: 1669804993}
+  - {fileID: 1576476884}
+  - {fileID: 1260537184}
+  - {fileID: 2037307741}
+  - {fileID: 1745922868}
+  - {fileID: 1515278135}
+  volumeText:
+  - {fileID: 1204318704}
+  - {fileID: 2124855290}
+  - {fileID: 1901976648}
+  - {fileID: 959451344}
+  guideSettingButton:
+  - {fileID: 789804186}
+  - {fileID: 496735054}
+  guideSettingImage:
+  - {fileID: 1347111972}
+  - {fileID: 1475609205}
+  - {fileID: 789804187}
+  - {fileID: 496735055}
+  guideSettingText:
+  - {fileID: 118182258}
+  - {fileID: 904654529}
+  - {fileID: 109988448}
+  volumeSelectedImage:
+  - {fileID: 1676762633}
+  - {fileID: 910419359}
+  - {fileID: 1903588582}
+  guideSettingSelectedImage:
+  - {fileID: 36339016}
+  - {fileID: 1359093713}
+  returnButton: {fileID: 817937905}
+  returnImage: {fileID: 817937904}
+  returnIcon: {fileID: 1067314092}
+  panelBackground: {fileID: 1669804993}
 --- !u!1 &1676762631
 GameObject:
   m_ObjectHideFlags: 0
@@ -4989,60 +5070,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d4c191351d62e4408e420147d029a93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageButton:
-  - {fileID: 177689005}
-  - {fileID: 1001033178}
-  - {fileID: 1969471998}
-  - {fileID: 1292721148}
-  stageImage:
-  - {fileID: 177689006}
-  - {fileID: 1001033179}
-  - {fileID: 1969471999}
-  - {fileID: 1578095151}
-  - {fileID: 94569153}
-  - {fileID: 1292721146}
-  stageText:
-  - {fileID: 610227748}
-  - {fileID: 495698211}
-  - {fileID: 1599726329}
-  volumeButton:
-  - {fileID: 2037307740}
-  - {fileID: 1745922867}
-  - {fileID: 1515278134}
-  - {fileID: 817937905}
-  volumeImage:
-  - {fileID: 2037307741}
-  - {fileID: 1745922868}
-  - {fileID: 1515278135}
-  - {fileID: 1669804993}
-  - {fileID: 1576476884}
-  - {fileID: 1260537184}
-  - {fileID: 817937904}
-  - {fileID: 1067314092}
-  volumeText:
-  - {fileID: 2124855290}
-  - {fileID: 1901976648}
-  - {fileID: 959451344}
-  - {fileID: 1204318704}
-  guideButton:
-  - {fileID: 789804186}
-  - {fileID: 496735054}
-  guideImage:
-  - {fileID: 789804187}
-  - {fileID: 496735055}
-  - {fileID: 1347111972}
-  - {fileID: 1475609205}
-  guideText:
-  - {fileID: 904654529}
-  - {fileID: 109988448}
-  - {fileID: 118182258}
-  volumeChecked:
-  - {fileID: 1676762633}
-  - {fileID: 910419359}
-  - {fileID: 1903588582}
-  guideChecked:
-  - {fileID: 1359093713}
-  - {fileID: 36339016}
+  stageChoisePanel: {fileID: 1578095153}
+  optionSettingPanel: {fileID: 1669804995}
 --- !u!4 &2121868224
 Transform:
   m_ObjectHideFlags: 0

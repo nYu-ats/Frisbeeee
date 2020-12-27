@@ -205,34 +205,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   addForce: 1100
-  decreaseForceX: -1
+  decreaseForceX: -2
   decreaseForceY: -2
   ToruqueX: 10
-  cameraSpeed: 0
-  audioClipBall: {fileID: 8300000, guid: 83584d293e4a0294f9deede746469704, type: 3}
-  audioClipPoll: {fileID: 8300000, guid: 799d96fd1ed5db44981e86b26d9ce225, type: 3}
-  audioDestroySelf: {fileID: 8300000, guid: 8f18c4c0c7ea7594b8c6ef09d2a8b463, type: 3}
-  effectParticlePoll: {fileID: 5370940135930366272, guid: 21a8e1926170b6b459cf4cda4058849f,
+  pollCutParticle: {fileID: 5370940135930366272, guid: 21a8e1926170b6b459cf4cda4058849f,
     type: 3}
-  effectParticleBallRed: {fileID: 5582284000749597801, guid: 5d8a51836d9e2694d81cf9c8d4598aab,
+  diskCrushParticle: {fileID: 5111544149636740372, guid: 696abd1504c48494d9eca2c6409f9008,
     type: 3}
-  effectParticleBallBlue: {fileID: 5582284000749597801, guid: 8c8ea447e0a5c7944a30e2b8de3625ac,
-    type: 3}
-  effectParticleBallWhite: {fileID: 5440168726598770360, guid: c684614f080aaa040b8126b0a81701a9,
-    type: 3}
-  effectDiskCrush: {fileID: 5111544149636740372, guid: 696abd1504c48494d9eca2c6409f9008,
-    type: 3}
-  effectRotation: {x: 0, y: 0, z: 0}
   effectCollisionFlash: {fileID: 717432252059397904, guid: ac53738d20bc8bc4092a81e8bc97da9f,
     type: 3}
-  diskIncreaseNumberBall: 2
   diskIncreaseNumberPoll: 3
-  colorIncreaseNumberBall: 1
   colorIncreaseNumberPoll: 1
   pollHitSound: {fileID: 6710448987413146347, guid: b6e12047b0c064043b56affb59d3a468,
     type: 3}
   wallHitSound: {fileID: 6710448987413146347, guid: a0ab4886fec4b4041b19f7373365ef1c,
     type: 3}
+  colorBar: {fileID: 0}
 --- !u!65 &5381260623983104098
 BoxCollider:
   m_ObjectHideFlags: 0

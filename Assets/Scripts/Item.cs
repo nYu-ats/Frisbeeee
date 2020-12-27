@@ -21,7 +21,7 @@ public class Item : MonoBehaviour
         if(collision.gameObject.tag == "Disk")
         {
             //アイテム未所持かどうか判断
-            if(!gameController.ReturnItemStatus(this.transform.parent.gameObject.tag))
+            if(!gameController.GetHaveItemStatus(this.transform.parent.gameObject.tag))
             {
                 this.GetItem(this.transform.parent.gameObject.tag);
             }
@@ -32,7 +32,7 @@ public class Item : MonoBehaviour
     private void GetItem(string item)
     {
         //アイテムを所持状態にする
-        gameController.GetItem(item);
+        gameController.SetHaveItemStatus(item, true);
         //効果音再生
         Instantiate(itemGetSound, this.transform.position, Quaternion.Euler(0, 0, 0));
         //自身を消去

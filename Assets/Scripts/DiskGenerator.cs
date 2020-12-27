@@ -36,7 +36,7 @@ public class DiskGenerator : MonoBehaviour
             {
                 if(Input.GetMouseButtonDown(0))
                 {
-                    tapStartPosition = Input.mousePosition; //画面がタップされた位置をディスクの射出方向を決める起点とする
+                    tapStartPosition = Input.mousePosition;
                     //画面がタップされた時にディスクが生成できる状態にする
                     //ディスク生成フラグのtrue/falseの切替タイミングの制御がしやすいため、ここでtrueをセットするようにする
                     diskGenerateFlag = true; 
@@ -71,7 +71,7 @@ public class DiskGenerator : MonoBehaviour
     }
 
     //アイテム消費やゲームポーズボタンを押したときにディスク生成フラグをfalseにセットできるようにする
-    public static void TappCancel()
+    public void TappCancel()
     {
         diskGenerateFlag = false;
     }

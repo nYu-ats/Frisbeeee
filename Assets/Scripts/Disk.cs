@@ -47,7 +47,7 @@ public class Disk : MonoBehaviour
         this.GetComponent<Rigidbody>().AddForce(new Vector3(addForceX, addForceY, addForceZ));
     }
 
-    void Update()
+    void FixedUpdate()
     {
         //ディスクを直進させるアイテムを使っている時はカーブさせない
         //アイテム未使用状態の時は一定後からでカーブさせる
