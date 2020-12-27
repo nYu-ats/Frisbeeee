@@ -4,14 +4,25 @@ using UnityEngine;
 using UnityEngine.UI;
 public class MenuPanelButton : MonoBehaviour
 {
-    public Button[] eachMenuButton;
-    public Image[] eachMenuImage;
-    public Text[] eachMenuText;
+    [SerializeField] Button[] eachMenuButton;
+    [SerializeField] Image[] eachMenuImage;
+    [SerializeField] Text[] eachMenuText;
+    [SerializeField] GameController gameController;
+    [SerializeField] DiskGenerator diskGenerator;    
+
     void Start()
     {
-       SwitchMenuPanelDisplay(false); 
+       SwitchMenuPanelDisplay(false);
     }
 
+    public void PauseGame()
+    {
+        diskGenerator.TappCancel(); //メニューボタンタップ時にディスクが生成させるのを防ぐ
+        gameController.SetGamePauseStatus(true);
+        SwitchMenuPanelDisplay(true);
+    }
+
+    //メニューパネルの表示非表示を切り替える
     public void SwitchMenuPanelDisplay(bool swtichStatus)
     {
         foreach(Button obj in eachMenuButton)

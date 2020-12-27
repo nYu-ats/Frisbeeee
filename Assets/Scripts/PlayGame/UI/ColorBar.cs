@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 public class ColorBar : MonoBehaviour
 {
-    public  Image colorBar;
-    public  Image colorMark;
-    public int colorChangeRate = 20;
-    public float colorMarkChangeRate = 12.5f;
+    public Image colorBar;
+    public Image colorMark;
+    public const int colorChangeRate = 20;
+    public const float colorMarkChangeRate = 12.5f;
 
     public void UpdateColorBar(float colorBarPosition)
     {

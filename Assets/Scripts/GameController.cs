@@ -7,64 +7,72 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
-    private int playerStartPosition;
     public static int stageNumber;
-    public bool straightItem = false;
-    public bool colorStopItem = false;
-    public bool diskInfinityItem = false;
-    public bool straightUsing = false;
-    public bool infinitytUsing = false;
-    public static bool colorStopUsing = false;
-    private float straightTime = 0.0f;
-    private float infinityTime = 0.0f;
-    private float colorStopTime = 0.0f;
     public static bool gamePause = false;
-    public int loadStage;
-    public static bool restartFlag;
+    public int loadStage; //ホーム画面からスタートステージをセットするための変数
     public ColorBar colorBarUI;
     public DiskCount diskCountUI;
     public GameOver gameOverUI;
     public GameClear gameClearUI;
-    public bool cameraStopFlag = false;
+    public static bool cameraStopFlag = false;
  
     void Start()
     {
-        stageNumber = loadStage;
+        stageNumber = loadStage; //ホーム画面で指定したステージからスタートするようにセット
         playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
-        playerStartPosition = (int) playerCamera.transform.position.z;
         stageProgress.ResestProgressBarStatus();
     }
 
     void Update()
     {
         StageProgressManagement();
+        CheckGameOver();
+        CheckGameClear();
+        ItemUsingTimeControl();
+        //UIの更新
         diskCountUI.UpdateDiskCountUI(diskCount);
         colorBarUI.UpdateColorBar(colorBarPosition);
-        ItemUsingTimeControl();
+    }
+
+    /*
+    ゲームオーバー・ゲームクリアのチェック
+    */
+    private void CheckGameOver()
+    {
+        //ディスク残弾が0もしくはカラーバーが青or赤に振り切ったらゲームオーバー
         if(diskCount <= 0 | colorBarPosition > 10 | colorBarPosition < -10)
         {
+            //カメラの進行を止めて、進行速度が0になったらゲームオーバーの表示を行う
+            //規定時間表示後、ホーム画面に遷移
             cameraStopFlag = true;
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameOverUI.DisplayGameOverMessage();
+                SetReachedStage();
                 Invoke("SceneReturn", 3.0f);
             }
         }
+    }
 
+    private void CheckGameClear()
+    {
+        //プレイヤーの位置が最終ステージの位置を超えたらゲームクリア
         if(playerCamera.transform.position.z >= stageLength[3])
         {
+            //カメラの進行を止めて、進行速度が0になったらゲームクリアの表示を行う
+            //規定時間表示後。ホーム画面に遷移
             cameraStopFlag = true;
             if(CameraMove.ReturnCameraSpeed() <= 0.0f)
             {
                 gameClearUI.DisplayGameClearEffect(playerCamera.transform.position);
+                SetReachedStage();
                 Invoke("SceneReturn", 5.0f);
             }
         }
     }
 
     //カラーバーのステータス更新
-    //赤or青のポールが破壊されたときに呼び出される
-    public float colorBarPosition = 0.0f;
+    public static float colorBarPosition = 0.0f;
     public void UpdateColorBarValue(float colorBarChangeValue)
     {
         colorBarPosition += colorBarChangeValue;
@@ -87,14 +95,10 @@ public class GameController : MonoBehaviour
         return cameraStopFlag;
     }
 
-    public bool ReturnRestartStatus()
-    {
-        return restartFlag;
-    }
     
 
     public StageProgressBar stageProgress;
-    public float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
+    public static float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
 
     public float[] ReturnStageConstitution()
     {
@@ -137,6 +141,17 @@ public class GameController : MonoBehaviour
             }
         }
     }
+
+
+    public bool straightItem = false;
+    public bool colorStopItem = false;
+    public bool diskInfinityItem = false;
+    public bool straightUsing = false;
+    public bool infinitytUsing = false;
+    public static bool colorStopUsing = false;
+    private static float straightTime = 0.0f;
+    private static float infinityTime = 0.0f;
+    private static float colorStopTime = 0.0f;
 
     public void SetHaveItemStatus(string item, bool status)
     {
@@ -259,28 +274,34 @@ public class GameController : MonoBehaviour
 
     public DiskGenerator diskGenerator;
 
-    public MenuPanelButton menuPanel;
-    public void PauseGame()
-    {
-        gamePause = true;
-        diskGenerator.TappCancel();
-        menuPanel.SwitchMenuPanelDisplay(true);
-    }
+    public MenuPanelButton menuPanelButton;
 
     public bool ReturnPauseStatus()
     {
         return gamePause;
     }
 
-    public void RestartGame()
+    public void SetGamePauseStatus(bool status)
     {
-        gamePause = false;
-        menuPanel.SwitchMenuPanelDisplay(false);
+        gamePause = status;
     }
 
-    public void SceneReturn()
+
+
+    //ゲームの状態を操作するので、初期化処理自体はGameControllerに実装
+    //"ホームへ戻る"や"ステージはじめからリスタート"ボタンの処理をする過程でこのメソッドを呼び出すようにする
+    public void InitializeGameStatus()
     {
-        RestartGame();
+        diskCount = 20;
+        //カラーバーのポジションを初期値にセット、UIをアップデートする
+        colorBarPosition = 0.0f;
+        colorBarUI.UpdateColorBar(colorBarPosition);
+    }
+
+    //"ホームへ戻る"ボタンでも使用する処理だが、ゲーム状態に関わる処理で、ゲームオーバーもしくはゲームクリア時にも必要な操作なため
+    //GameController側へ実装
+    public void SetReachedStage()
+    {
         if(PlayerPrefs.HasKey("Stage"))
         {
             if(PlayerPrefs.GetInt("Stage") < stageNumber)
@@ -292,28 +313,27 @@ public class GameController : MonoBehaviour
         {
             PlayerPrefs.SetInt("Stage", stageNumber);
         }
-        InitializeGameStatus();
-        SceneManager.LoadScene("Home");
     }
 
-    private void InitializeGameStatus()
+
+    public float GetStageStartPosition()
     {
-        diskCount = 20;
-        //カラーバーのポジションを初期値にセット、UIをアップデートする
-        colorBarPosition = 0.0f;
-        colorBarUI.UpdateColorBar(colorBarPosition);
+        return stageLength[stageNumber - 1];
     }
 
-    public void RestartStage()
+    public int GetStageNumber()
     {
-        RestartGame();
-        restartFlag = true;
-        InitializeGameStatus();
-        playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
+        return stageNumber;
     }
 
-    public static void ReadyToRestart()
+    public static bool restartFlag; 
+    public bool ReturnRestartStatus()
     {
-        restartFlag = false;
+        return restartFlag;
+    }
+
+    public static void SetRestartFlag(bool status)
+    {
+        restartFlag = status;
     }
 }

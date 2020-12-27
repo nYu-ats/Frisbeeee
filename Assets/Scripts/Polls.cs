@@ -30,6 +30,7 @@ public class Polls : MonoBehaviour
         uiCanvas = GameObject.Find("Canvas");
         
         //切断後のポールであればオブジェクトを少し回転させる
+        //タグでカット済みのポールと判断して、規定時間経過で消去する
         if(victim.name == "right side")
         {
            victim.GetComponent<Rigidbody>().AddTorque(-10, 0, 0, ForceMode.Impulse);
@@ -88,6 +89,7 @@ public class Polls : MonoBehaviour
         }
     }
 
+    //カットしたポールの色に対応したポップアップ(例えば白ポール -> ディスク残弾+2)を出す
     private void DisplayPopUp(GameObject obj)
     {
         GameObject popUp = Instantiate(obj);

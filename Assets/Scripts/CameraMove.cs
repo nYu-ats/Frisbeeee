@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/*
-カメラの移動とともにゲームが進行する
-ステージに応じて移動速度を変える
-*/
 public class CameraMove : MonoBehaviour
 {
     public static float moveSpeed;
     private Vector3 cameraPosition;
     private Quaternion cameraRotation;
     private float positionZ;
-    //ゲームシーンロード後、移動を始めるまでの待機時間
-    [SerializeField] float stayTime;
-    //カメラを移動させるか、待機させるか判断用のフラグ
-    private bool proceedFlag = false;
-    //カメラを減速させる速度
-    private float decreaseSpeed = 0.5f;
+    private bool proceedFlag = false; //カメラを移動させるか、待機させるか判断用のフラグ
+    [SerializeField] float stayTime; //ゲームシーンロード後、移動を始めるまでの待機時間
+
+    [SerializeField] float decreaseSpeed = 0.5f; //ゲームオーバーorゲームクリア時に、カメラを減速させるための速度
+
     public GameController gameController;
 
     void Start()
@@ -36,7 +31,7 @@ public class CameraMove : MonoBehaviour
         */
         if(!gameController.ReturnCameraStopFlag())
         {
-            if(GameController.stageNumber == 1)
+            if(gameController.GetStageNumber() == 1)
             {
                 moveSpeed = 5.0f;
             }
@@ -71,7 +66,7 @@ public class CameraMove : MonoBehaviour
         {
             proceedFlag = false;
             StartCoroutine(CameraPositionSet(stayTime));
-            GameController.ReadyToRestart();
+            GameController.SetRestartFlag(false);
         }
         
         //カメラを移動させる処理
