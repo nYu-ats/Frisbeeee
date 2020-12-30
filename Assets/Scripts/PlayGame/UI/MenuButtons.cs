@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /*
-メニューパネルの各ボタンにて、ボタンクリック時にメニューパネルの非表示処理を行うので
+メニューパネルの3つのボタンいずれも、クリック時にDisableMenuPanelが必要なので
 このクラスにクリック処理をまとめて記述
 */
 public class MenuButtons : MonoBehaviour
@@ -16,23 +15,25 @@ public class MenuButtons : MonoBehaviour
     //ゲーム再開ボタンに割り当て
     public void DisableMenuPanel()
     {
-        gameController.SetGamePauseStatus(false);
+        gameController.GamePause = false;
         menuPanelButton.SwitchMenuPanelDisplay(false);
     }
 
     //ステージはじめからリスタートボタンに割り当て
     public void RestartStageStart()
     {
-        GameController.SetRestartFlag(true);
+        float[] eachStageArray = gameController.StageLength;
+        float restartStagePositionZ = eachStageArray[gameController.StageNumber - 1];
+        playerCamera.GetComponent<CameraMove>().RestartFlag = true;
         gameController.InitializeGameStatus();
-        playerCamera.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, gameController.GetStageStartPosition());
+        playerCamera.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, restartStagePositionZ);
         DisableMenuPanel();
     }
 
     //ホームに戻るボタンに割り当て
     public void ReturnToHome()
     {
-        int stageNumber = gameController.GetStageNumber();
+        int stageNumber = gameController.StageNumber;
         DisableMenuPanel();
         gameController.InitializeGameStatus();
         gameController.SetReachedStage();

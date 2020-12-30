@@ -26,7 +26,7 @@ public class Guide : MonoBehaviour
 
     void Start()
     {
-        if(PlayerPrefs.GetInt("Guide") == 1)
+        if(PlayerPrefs.GetInt("Guide") == 0)
         {
             displayGuideFlag = true;
         }
@@ -43,42 +43,52 @@ public class Guide : MonoBehaviour
         }
     }
 
+    enum GuideDisPlayPosition
+    {
+        Flick = 100,
+        WhitePoll = 200,
+        ColorPoll = 320,
+        Obstacle = 520,
+        GameOverRule = 670,
+        StageGateSwitch = 3020
+    }
+
 
     private void DisplayGuide()
     {
-        switch(Mathf.Floor(playerPosition.position.z))
+        switch((int)Mathf.Floor(playerPosition.position.z))
         {
-            case 100:
+            case (int)GuideDisPlayPosition.Flick:
             guideFlickImage.enabled = true;
             guideFlickText.enabled = true;
             StartCoroutine(DisactivateGuide(guideFlickImage, guideFlickText, displayTime));
             break;
             
-            case 200:
+            case (int)GuideDisPlayPosition.WhitePoll:
             guideWhitePollImage.enabled = true;
             guideWhitePollText.enabled = true;
             StartCoroutine(DisactivateGuide(guideWhitePollImage, guideWhitePollText, displayTime));
             break;
 
-            case 320:
+            case (int)GuideDisPlayPosition.ColorPoll:
             guideColorPollImage.enabled = true;
             guideColorPollText.enabled = true;
             StartCoroutine(DisactivateGuide(guideColorPollImage, guideColorPollText, displayTime));
             break;
 
-            case 520:
+            case (int)GuideDisPlayPosition.Obstacle:
             guideObstacleImage.enabled = true;
             guideObstacleText.enabled = true;
             StartCoroutine(DisactivateGuide(guideObstacleImage, guideObstacleText, displayTime));
             break;
 
-            case 670:
+            case (int)GuideDisPlayPosition.GameOverRule:
             guideGameOverImage.enabled = true;
             guideGameOverText.enabled = true;
             StartCoroutine(DisactivateGuide(guideGameOverImage, guideGameOverText, displayTime));
             break;
 
-            case 3020:
+            case (int)GuideDisPlayPosition.StageGateSwitch:
             guideSwitchImage.enabled = true;
             guideSwitchText.enabled = true;
             StartCoroutine(DisactivateGuide(guideSwitchImage, guideSwitchText, displayTime)); 

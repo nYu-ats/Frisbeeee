@@ -1,38 +1,79 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     [SerializeField] Camera playerCamera;
-    public static int stageNumber;
-    public static bool gamePause = false;
-    public int loadStage; //ホーム画面からスタートステージをセットするための変数
-    public ColorBar colorBarUI;
     public GameOver gameOverUI;
     public GameClear gameClearUI;
-    public static bool cameraStopFlag = false;
+
+    public int loadStage; //ホーム画面から指定のあったスタートステージを格納するための変数
+
+    private int stageNumber;
+    //滞在ステージ番号のプロパティ
+    public int StageNumber
+    {
+        get{return this.stageNumber;}
+    }
+
+    private bool gamePause = false; //ゲームポーズ状態を管理するフラグ
+    //プロパティ
+    public bool GamePause
+    {
+        set{this.gamePause = value;}
+        get{return gamePause;}
+    }
+
+    //カラーバーのステータス更新
+    //Uiの更新は行わず、値の更新のみ行う
+    private float colorBarPosition = 0.0f;
+    
+    //カラーバーのプロパティ
+    public float ColorBarPosition
+    {
+        set{this.colorBarPosition += value;}
+        get{return colorBarPosition;}
+    }
+
+    //ディスク残弾の更新
+    //UIの更新は行わず、値の更新のみ行う
+    private int diskCount = 20;
+
+    //ディスク残弾のプロパティ
+    public int DiskCount
+    {
+        set{this.diskCount += value;}
+        get{return this.diskCount;}
+    }
  
     void Start()
     {
         stageNumber = loadStage; //ホーム画面で指定したステージからスタートするようにセット
+        SwitchActiveStage(stageNumber);
         playerCamera.transform.position = new Vector3(playerCamera.transform.position.x, playerCamera.transform.position.y, stageLength[stageNumber - 1]);
-        stageProgress.ResestProgressBarStatus();
     }
 
     void Update()
     {
         StageProgressManagement();
         CheckGameOver();
-        CheckGameClear();
         ItemUsingTimeControl();
     }
+    
 
     /*
     ゲームオーバー・ゲームクリアのチェック
     */
+    //ゲームクリアもしくはゲームオーバーの状態を管理するフラグ
+    private bool gameStopFlag = false;
+    //プロパティ
+    public bool GameStopFlag
+    {
+        get{return this.gameStopFlag;}
+    }
+
     private void CheckGameOver()
     {
         //ディスク残弾が0もしくはカラーバーが青or赤に振り切ったらゲームオーバー
@@ -40,8 +81,8 @@ public class GameController : MonoBehaviour
         {
             //カメラの進行を止めて、進行速度が0になったらゲームオーバーの表示を行う
             //規定時間表示後、ホーム画面に遷移
-            cameraStopFlag = true;
-            if(CameraMove.ReturnCameraSpeed() <= 0.0f)
+            gameStopFlag = true;
+            if(playerCamera.GetComponent<CameraMove>().MoveSpeed <= 0.0f)
             {
                 gameOverUI.DisplayGameOverMessage();
                 InitializeGameStatus();
@@ -51,246 +92,175 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void CheckGameClear()
+    private void GameClear()
     {
-        //プレイヤーの位置が最終ステージの位置を超えたらゲームクリア
-        if(playerCamera.transform.position.z >= stageLength[3])
+        //カメラの進行を止めて、進行速度が0になったらゲームクリアの表示を行う
+        //規定時間表示後。ホーム画面に遷移
+        gameStopFlag = true;
+        if(playerCamera.GetComponent<CameraMove>().MoveSpeed <= 0.0f)
         {
-            //カメラの進行を止めて、進行速度が0になったらゲームクリアの表示を行う
-            //規定時間表示後。ホーム画面に遷移
-            cameraStopFlag = true;
-            if(CameraMove.ReturnCameraSpeed() <= 0.0f)
-            {
-                gameClearUI.DisplayGameClearEffect(playerCamera.transform.position);
-                InitializeGameStatus();
-                SetReachedStage();
-                Invoke("ReturnToHome", 5.0f);
-            }
+            gameClearUI.DisplayGameClearEffect(playerCamera.transform.position);
+            InitializeGameStatus();
+            SetReachedStage();
+            Invoke("ReturnToHome", 5.0f);
         }
     }
 
     //ゲームオーバーもしくはゲームクリア時のInvokeにメソッド名を文字列で渡す必要があるため
+    //ホームへ戻るボタンが押された際にもこちらを使用する
     public void ReturnToHome()
     {
         SceneManager.LoadScene("Home");
     }
 
-    //カラーバーのステータス更新
-    public static float colorBarPosition = 0.0f;
-    public void UpdateColorBarValue(float colorBarChangeValue)
+
+    /*
+    ステージ進行状況を更新する処理
+    */
+    [SerializeField] GameObject[] eachStageObject;
+
+    private float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
+    //ステージ長のプロパティ
+    public float[] StageLength
     {
-        colorBarPosition += colorBarChangeValue;
+        set{}
+        get{return this.stageLength;}
     }
 
-    public float GetColorBarPosition()
-    {
-        return colorBarPosition;
-    }
-
-    //ディスク残弾の更新
-    public static int diskCount = 20;
-    public void UpdateDiskCount(int diskCountChangeValue)
-    {
-        diskCount += diskCountChangeValue;
-    }
-    public int ReturnDiskCount()
-    {
-        return diskCount;
-    }
-
-    public bool ReturnCameraStopFlag()
-    {
-        return cameraStopFlag;
-    }
-
-    
-
-    public StageProgressBar stageProgress;
-    public static float[] stageLength = new float[4]{0.0f, 3073.0f, 9923.0f, 14101.0f};
-
-    public float[] ReturnStageConstitution()
-    {
-        return stageLength;
-    }
-
+    //ゲーム進行に合わせて滞在ステージ番号の更新とステージオブジェクトのActivateを切り替える
     private void StageProgressManagement()
     {
         if(stageNumber == 1)
         {
-            if(playerCamera.transform.position.z <= stageLength[stageNumber])
+            if(playerCamera.transform.position.z > stageLength[stageNumber])
             {
-                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
-            }
-            else
-            {
-                stageProgress.ResestProgressBarStatus();
                 stageNumber += 1;
+                SwitchActiveStage(stageNumber);
             }
         }
 
         if(stageNumber == 2)
         {
-            if(playerCamera.transform.position.z <= stageLength[stageNumber])
+            if(playerCamera.transform.position.z > stageLength[stageNumber])
             {
-                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
-            }
-            else
-            {
-                stageProgress.ResestProgressBarStatus();
                 stageNumber += 1;
+                SwitchActiveStage(stageNumber);
             }
         }
 
         if(stageNumber == 3)
         {
-            if(playerCamera.transform.position.z <= stageLength[stageNumber])
+            if(playerCamera.transform.position.z > stageLength[stageNumber])
             {
-                stageProgress.UpdateStageProgressBar(playerCamera.transform.position.z, stageNumber);
+                //プレイヤーの位置が最終ステージの位置を超えたらゲームクリア
+                GameClear();
+            }
+        }
+    }
+
+    private void SwitchActiveStage(int isStage)
+    {
+        //滞在ステージと1つ次のステージ併せて2ステージ分をActivateに、その他はDisactivate
+        //滞在ステージ = 最終ステージの場合は、滞在ステージのみをActivateにする
+        int isStageIndex = isStage - 1; //わかりやすくするためステージ番号 -> ステージ配列のインデックスに変換
+        eachStageObject[isStageIndex].SetActive(true);
+        isStageIndex += 1; //次ステージのインデックス
+        if(isStageIndex / eachStageObject.Length < 1)
+        {
+            eachStageObject[isStageIndex].SetActive(true);
+        }
+        else
+        {
+            isStageIndex -= eachStageObject.Length;
+            eachStageObject[isStageIndex].SetActive(false);
+        }
+        //下記処理で不要ステージをDisactivateにする
+        //2ステージ分はすでに処理済み(Activate)なので、その分ループ回数を2減らす
+        for(int i = 0; i < eachStageObject.Length -2; i ++)
+        {
+            isStageIndex += 1;
+            if(isStageIndex / eachStageObject.Length < 1)
+            {
+                eachStageObject[isStageIndex].SetActive(false);
+            }
+            else
+            {
+                isStageIndex -= eachStageObject.Length;
+                eachStageObject[isStageIndex].SetActive(false);
             }
         }
     }
 
 
-    public bool straightItem = false;
-    public bool colorStopItem = false;
-    public bool diskInfinityItem = false;
-    public bool straightUsing = false;
-    public bool infinitytUsing = false;
-    public static bool colorStopUsing = false;
-    private static float straightTime = 0.0f;
-    private static float infinityTime = 0.0f;
-    private static float colorStopTime = 0.0f;
-
+    /*
+    アイテムの管理に関する処理
+    */
+    //アイテム所持しているか否かを示すディクショナリ
+    private Dictionary<string, bool> haveItem = new Dictionary<string, bool>()
+    {
+        {"Straight", false},
+        {"Infinity", false},
+        {"ColorStop", false},
+    };
+    //アイテム所持ステータスのアクセサ
     public void SetHaveItemStatus(string item, bool status)
     {
-        if(item == "Straight")
-        {
-            straightItem = status;
-        }
-        else if(item == "Infinity")
-        {
-            diskInfinityItem = status;
-        }
-        else if(item == "ColorStop")
-        {
-            colorStopItem = status;
-        }
+        haveItem[item] = status;
     }
-
     public bool GetHaveItemStatus(string item)
     {
-        if(item == "Straight")
-        {
-            return straightItem;
-        }
-        else if(item == "Infinity")
-        {
-            return diskInfinityItem;
-        }
-        else if(item == "ColorStop")
-        {
-            return colorStopItem;
-        }
-        else
-        {
-            return false;
-        }
+        return haveItem[item];
     }
 
-    public void SetItemUseStatus(string item, bool status, float itemUseTime)
+    //アイテム使用中か否かを示すディクショナリ
+    private Dictionary<string, bool> itemUsing = new Dictionary<string, bool>()
     {
-        if(item == "Straight")
-        {
-            straightUsing = status;
-            straightTime = itemUseTime;
-        }
-        else if(item == "Infinity")
-        {
-            infinitytUsing = status;
-            infinityTime = itemUseTime;
-        }
-        else if(item == "ColorStop")
-        {
-            colorStopUsing = status;
-            colorStopTime = itemUseTime;
-        }
-    }
-
-
-    public bool ReturnItemUsingStatus(string item)
+        {"Straight", false},
+        {"Infinity", false},
+        {"ColorStop", false},
+    };
+    //アイテム使用ステータスのアクセサ
+    public void SetItemUseStatus(string item, bool statuse)
     {
-        if(item == "Straight")
-        {
-            return straightUsing;
-        }
-        else if(item == "Infinity")
-        {
-            return infinitytUsing;
-        }
-        else if(item == "ColorStop")
-        {
-            return colorStopUsing;
-        }
-        else
-        {
-            return false;
-        }
-
+        itemUsing[item] = statuse;
+    }
+    public bool GetItemUseStatus(string item)
+    {
+        return itemUsing[item];
     }
 
+    //アイテム使用可能な時間の設定
+    private Dictionary<string, float> itemEffectTime = new Dictionary<string, float>()
+    {
+        {"Straight", 0.0f},
+        {"Infinity", 0.0f},
+        {"ColorStop", 0.0f}, 
+    };
+    //アイテム使用時間のアクセサ
+    public void SetItemUseTime(string item, float time)
+    {
+        itemEffectTime[item] = time;
+    }
+
+    //各アイテムの仕様状態をチェックし、使用中であれば使用可能時間を減算していく
     void ItemUsingTimeControl()
     {
-        if(straightUsing)
+        foreach(KeyValuePair<string, bool> itemStatusPair in itemUsing)
         {
-            if(straightTime > 0.0f)
+            if(itemStatusPair.Value)
             {
-                straightTime -= Time.deltaTime;
-            }
-            else
-            {
-                straightTime = 0.0f;
-                straightUsing = false;
-            }
-        }
-
-        if(infinitytUsing)
-        {
-            if(infinityTime > 0.0f)
-            {
-                infinityTime -= Time.deltaTime;
-            }
-            else
-            {
-                infinityTime = 0.0f;
-                infinitytUsing = false;
-            }
-        }
-
-        if(colorStopUsing)
-        {
-            if(colorStopTime > 0.0f)
-            {
-                colorStopTime -= Time.deltaTime;
-            }
-            else
-            {
-                colorStopTime = 0.0f;
-                colorStopUsing = false;
+                if(itemEffectTime[itemStatusPair.Key] > 0.0f)
+                {
+                    itemEffectTime[itemStatusPair.Key] -= Time.deltaTime;
+                }
+                else
+                {
+                    itemEffectTime[itemStatusPair.Key] -= Time.deltaTime;
+                    itemUsing[itemStatusPair.Key] = false;  
+                }
             }
         }
     }
-
-
-    public bool ReturnPauseStatus()
-    {
-        return gamePause;
-    }
-
-    public void SetGamePauseStatus(bool status)
-    {
-        gamePause = status;
-    }
-
 
 
     //ゲームの状態を操作するので、初期化処理自体はGameControllerに実装
@@ -319,18 +289,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-
-    public float GetStageStartPosition()
-    {
-        return stageLength[stageNumber - 1];
-    }
-
-    public int GetStageNumber()
-    {
-        return stageNumber;
-    }
-
-    public static bool restartFlag; //ステージはじめからリスタート時に、カメラの移動
+    public static bool restartFlag;
     public bool ReturnRestartStatus()
     {
         return restartFlag;
@@ -340,4 +299,6 @@ public class GameController : MonoBehaviour
     {
         restartFlag = status;
     }
+
+
 }

@@ -13,7 +13,7 @@ public class ColorBar : MonoBehaviour
 
     void Update()
     {
-        colorBar.GetComponent<RectTransform>().localPosition = new Vector2(gameController.GetColorBarPosition() * colorChangeRate, 0);
-        colorMark.GetComponent<RectTransform>().localPosition = new Vector2(gameController.GetColorBarPosition() * colorMarkChangeRate, 0); 
+        colorBar.GetComponent<RectTransform>().localPosition = new Vector2(gameController.ColorBarPosition * colorChangeRate, 0);
+        colorMark.GetComponent<RectTransform>().localPosition = new Vector2(gameController.ColorBarPosition * colorMarkChangeRate, 0); 
     }
 }

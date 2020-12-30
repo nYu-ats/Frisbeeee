@@ -6,23 +6,20 @@ using UnityEngine.UI;
 public class StageProgressBar : MonoBehaviour
 {
     [SerializeField] Image stageProgressBar;
+    [SerializeField] Camera playerCamera;
+    [SerializeField] GameController gameController;
+
     private int stageProgressBarLength = 1000;
     private float stageProgressBarHeight = 1.5f;
-    public GameController gameController;
     private float[] stageLength;
 
     void Start()
     {
-        stageLength = gameController.ReturnStageConstitution();
+        stageLength = gameController.StageLength;
     }
 
-    public void UpdateStageProgressBar(float playerPosition, int stageNumber)
+    void Update()
     {
-        stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2((playerPosition - stageLength[stageNumber - 1]) / stageLength[stageNumber] * stageProgressBarLength, stageProgressBarHeight);
-    }
-
-    public void ResestProgressBarStatus()
-    {
-        stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, stageProgressBarHeight);     
+        stageProgressBar.GetComponent<RectTransform>().sizeDelta = new Vector2((playerCamera.transform.position.z - stageLength[gameController.StageNumber - 1]) / stageLength[gameController.StageNumber] * stageProgressBarLength, stageProgressBarHeight);
     }
 }

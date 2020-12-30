@@ -18,7 +18,7 @@ public class MenuPanelButton : MonoBehaviour
     public void PauseGame()
     {
         diskGenerator.TappCancel(); //メニューボタンタップ時にディスクが生成させるのを防ぐ
-        gameController.SetGamePauseStatus(true);
+        gameController.GamePause = true;
         SwitchMenuPanelDisplay(true);
     }
 

@@ -11,7 +11,7 @@ public class ItemButton : MonoBehaviour
     [SerializeField] GameController gameController;
     [SerializeField] DiskGenerator diskGenerator;
     [SerializeField] Image[] itemUsingImage;
-    [SerializeField] const float canItemUseTime = 5.0f;
+    [SerializeField] const float itemUseTime = 5.0f;
 
     void Start()
     {
@@ -41,8 +41,9 @@ public class ItemButton : MonoBehaviour
         itemImage.enabled = false;
         itemButton.enabled = false;
         gameController.SetHaveItemStatus(thisItemName, false); //アイテム所持 -> 未所持へフラグを変更
-        gameController.SetItemUseStatus(thisItemName, true, canItemUseTime); //アイテムを使用状態にして、使用可能時間をセット
-        StartCoroutine(DisactivateItemUsingImage(canItemUseTime));
+        gameController.SetItemUseStatus(thisItemName, true); //アイテムを使用状態にして、使用可能時間をセット
+        gameController.SetItemUseTime(thisItemName, itemUseTime);
+        StartCoroutine(DisactivateItemUsingImage(itemUseTime));
     }
 
     //アイテム使用中を示すイメージは、規定時間(アイテム使用可能時間と同等)経過で非表示へ

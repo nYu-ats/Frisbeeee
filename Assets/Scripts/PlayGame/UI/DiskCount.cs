@@ -15,6 +15,6 @@ public class DiskCount : MonoBehaviour
     }
     public void UpdateDiskCountUI()
     {
-        diskCountText.text = "残弾 : " + gameController.ReturnDiskCount();   
+        diskCountText.text = "残弾 : " + gameController.DiskCount;   
     }
 }
