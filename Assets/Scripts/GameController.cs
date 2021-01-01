@@ -39,7 +39,7 @@ public class GameController : MonoBehaviour
 
     //ディスク残弾の更新
     //UIの更新は行わず、値の更新のみ行う
-    private int diskCount = 20;
+    private int diskCount = 30;
 
     //ディスク残弾のプロパティ
     public int DiskCount
@@ -267,7 +267,7 @@ public class GameController : MonoBehaviour
     //"ホームへ戻る"や"ステージはじめからリスタート"ボタンの処理をする過程でこのメソッドを呼び出すようにする
     public void InitializeGameStatus()
     {
-        diskCount = 20;
+        diskCount = 30;
         //カラーバーのポジションを初期値にセット、UIをアップデートする
         colorBarPosition = 0.0f;
     }

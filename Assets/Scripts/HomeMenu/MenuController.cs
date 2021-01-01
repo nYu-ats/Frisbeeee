@@ -41,10 +41,12 @@ public class MenuController : MonoBehaviour
     */
     private const int stageCount = 3;     //ステージ数は3つ
     public StageChoisePanel stageChoisePanel;
+    [SerializeField] GameObject buttonPushedSound;
 
     //スタートボタンクリック時の処理
     public void OnStartButtonClicked()
     {
+        Instantiate(buttonPushedSound);
         //ステージセレクト画面を表示する
         stageChoisePanel.SwitchStageChoisePanelDisplay(true);
         //未到達ステージがある場合は、選択できないようにする
@@ -63,6 +65,7 @@ public class MenuController : MonoBehaviour
     //オプションボタンクリック時の処理
     public void OnOptionBuutnClicked()
     {
+        Instantiate(buttonPushedSound);
         optionSettingPanel.SwitchOptionSelectPanelDisplay(true);
         //オプション設定値を示すイメージを表示する
         optionSettingPanel.DisplaySelectedOptionValue(PlayerPrefs.GetInt("Volume"), PlayerPrefs.GetInt("Guide"), true);
@@ -98,6 +101,7 @@ public class MenuController : MonoBehaviour
     //ステージセレクトボタンがクリック時の処理
     public void OnStageButtonclicked(int stageNumber)
     {
+        Instantiate(buttonPushedSound);
         //選択されたステージ番号をセット
         startStage = stageNumber;
         //シーンロード時のイベントハンドラーをセット
@@ -120,6 +124,7 @@ public class MenuController : MonoBehaviour
     //音量調節ボタンクリック時の処理
     public void SetVolume(int volume)
     {
+        Instantiate(buttonPushedSound);
         PlayerPrefs.SetInt("Volume", volume);
         optionSettingPanel.SetSelectedVolumeImage(volume);
     }
@@ -127,6 +132,7 @@ public class MenuController : MonoBehaviour
     //ガイド表示切替ボタンクリック時の処理
     public void SetGuide(int onOffFlag)
     {
+        Instantiate(buttonPushedSound);
         PlayerPrefs.SetInt("Guide", onOffFlag);
         optionSettingPanel.SetSelectedGuideSettingImage(onOffFlag);
     }
